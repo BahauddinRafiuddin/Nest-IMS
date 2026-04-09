@@ -1,0 +1,372 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////////////////////////////////
+// ENUMS
+//////////////////////////////////////////////////
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  MENTOR
+  INTERN
+  PUBLIC_USER
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum ReviewStatus {
+  PENDING
+  REVIEWED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum JoinRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum ProgramType {
+  FREE
+  PAID
+}
+
+enum ProgramStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  UPCOMING
+}
+
+enum EnrollmentStatus {
+  CANCELLED
+  APPROVED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum EnrollmentPaymentStatus {
+  NOT_REQUIRED
+  PENDING
+  PAID
+  REFUNDED
+}
+
+//////////////////////////////////////////////////
+// MODELS
+//////////////////////////////////////////////////
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(PUBLIC_USER)
+  isActive  Boolean  @default(true)
+  forcePasswordChange Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  enrollmentsAsIntern Enrollment[] @relation("EnrollmentIntern")
+  enrollmentsAsMentor Enrollment[] @relation("EnrollmentMentor")
+
+  programsMentored InternshipProgram[] @relation("ProgramMentor")
+
+  tasksAssigned Task[] @relation("AssignedIntern")
+  tasksMentored Task[] @relation("MentorTasks")
+
+  reviews Review[]
+  payments Payment[]
+  joinRequests JoinRequest[]
+  reviewedRequests JoinRequest[] @relation("ReviewedBy")
+
+  commissionUpdates CommissionHistory[]
+
+  @@index([companyId])
+}
+
+//////////////////////////////////////////////////
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  email     String
+  phone     String?
+  address   String?
+  commissionPercentage Int @default(20)
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users User[]
+  programs InternshipProgram[]
+  payments Payment[]
+  reviews Review[]
+  joinRequests JoinRequest[]
+  wallet CompanyWallet?
+  commissionHistory CommissionHistory[]
+}
+
+//////////////////////////////////////////////////
+
+model InternshipProgram {
+  id        String   @id @default(uuid())
+  title     String
+  domain    String
+  description String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  mentorId  String
+  mentor    User @relation("ProgramMentor", fields: [mentorId], references: [id])
+
+  type      ProgramType @default(FREE)
+  price     Float @default(0)
+
+  startDate DateTime?
+  endDate   DateTime?
+  durationInWeeks Int
+
+  status    ProgramStatus @default(UPCOMING)
+  minimumTasksRequired Int @default(5)
+  rules     String?
+
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks Task[]
+  enrollments Enrollment[]
+  payments Payment[]
+  reviews Review[]
+  joinRequests JoinRequest[]
+}
+
+//////////////////////////////////////////////////
+
+model Enrollment {
+  id        String   @id @default(uuid())
+
+  internId  String
+  intern    User @relation("EnrollmentIntern", fields: [internId], references: [id])
+
+  programId String
+  program   InternshipProgram @relation(fields: [programId], references: [id])
+
+  mentorId  String?
+  mentor    User? @relation("EnrollmentMentor", fields: [mentorId], references: [id])
+
+  status    EnrollmentStatus @default(APPROVED)
+  paymentStatus EnrollmentPaymentStatus @default(NOT_REQUIRED)
+
+  paymentId String? @unique
+  payment   Payment?
+
+  enrolledAt DateTime @default(now())
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tasks Task[]
+  review Review?
+
+  @@unique([internId, programId])
+}
+
+//////////////////////////////////////////////////
+
+model Task {
+  id        String   @id @default(uuid())
+  title     String
+  description String?
+
+  programId String
+  program   InternshipProgram @relation(fields: [programId], references: [id])
+
+  mentorId  String
+  mentor    User @relation("MentorTasks", fields: [mentorId], references: [id])
+
+  assignedInternId String
+  assignedIntern   User @relation("AssignedIntern", fields: [assignedInternId], references: [id])
+
+  enrollmentId String
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id])
+
+  priority TaskPriority @default(MEDIUM)
+  status   TaskStatus   @default(PENDING)
+
+  deadline DateTime
+  assignedAt DateTime @default(now())
+
+  submittedAt DateTime?
+  reviewedAt  DateTime?
+
+  submissionText String?
+  submissionLink String?
+  submissionFile String?
+
+  feedback String?
+  score    Int?
+
+  reviewStatus ReviewStatus @default(PENDING)
+
+  isLate Boolean @default(false)
+  attempts Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////
+
+model Review {
+  id        String @id @default(uuid())
+
+  internId  String
+  intern    User @relation(fields: [internId], references: [id])
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  programId String
+  program   InternshipProgram @relation(fields: [programId], references: [id])
+
+  enrollmentId String @unique
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id])
+
+  rating Int
+  comment String?
+
+  status JoinRequestStatus @default(ACCEPTED)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////
+
+model Payment {
+  id        String @id @default(uuid())
+
+  internId  String
+  intern    User @relation(fields: [internId], references: [id])
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  programId String
+  program   InternshipProgram @relation(fields: [programId], references: [id])
+
+  enrollmentId String @unique
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id])
+
+  totalAmount Float
+  superAdminCommission Float
+  companyEarning Float
+  commissionPercentage Float
+
+  paymentStatus PaymentStatus @default(PENDING)
+
+  transactionId String?
+  paymentMethod String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////
+
+model JoinRequest {
+  id        String @id @default(uuid())
+
+  userId    String
+  user      User @relation(fields: [userId], references: [id])
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  programId String?
+  program   InternshipProgram? @relation(fields: [programId], references: [id])
+
+  status JoinRequestStatus @default(PENDING)
+
+  message String?
+
+  reviewedById String?
+  reviewedBy   User? @relation("ReviewedBy", fields: [reviewedById], references: [id])
+
+  reviewedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, companyId, status])
+}
+
+//////////////////////////////////////////////////
+
+model CompanyWallet {
+  id        String @id @default(uuid())
+
+  companyId String @unique
+  company   Company @relation(fields: [companyId], references: [id])
+
+  totalEarning Float @default(0)
+  totalWithdrawn Float @default(0)
+  availableBalance Float @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////
+
+model CommissionHistory {
+  id        String @id @default(uuid())
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  commissionPercentage Float
+  startDate DateTime
+  endDate   DateTime?
+
+  updatedById String?
+  updatedBy   User? @relation(fields: [updatedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
