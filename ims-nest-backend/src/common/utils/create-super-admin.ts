@@ -14,12 +14,19 @@ export async function createSuperAdmin() {
     return;
   }
 
-  const hashedPassword = await bcrypt.hash('Super@123', 10);
+  const email = process.env.SUPER_ADMIN_EMAIL;
+  const password = process.env.SUPER_ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    throw new Error('Missing SUPER ADMIN credentials in .env');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   await prisma.user.create({
     data: {
       name: 'Super Admin',
-      email: 'superadmin@ims.com',
+      email: email,
       password: hashedPassword,
       role: Role.SUPER_ADMIN,
     },
