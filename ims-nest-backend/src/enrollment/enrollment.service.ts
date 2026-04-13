@@ -59,7 +59,7 @@ export class EnrollmentService {
   async myEnrollments(user: any) {
   const enrollments = await this.prisma.enrollment.findMany({
     where: {
-      internId: user.id,
+      internId: user.userId,
       program: {
         isActive: true 
       }
