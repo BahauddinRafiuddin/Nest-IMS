@@ -1,10 +1,12 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
+import { EnrollmentStatus } from '@prisma/client';
+import { PerformanceService } from '../performance/performance.service';
 
 @Injectable()
 export class EnrollmentService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService, private performanceService: PerformanceService) { }
 
   async enrollIntern(data: CreateEnrollmentDto, user: any) {
     const { internId, programId } = data
@@ -119,5 +121,78 @@ export class EnrollmentService {
       message: 'Internship started successfully',
       enrollment: updated
     }
+  }
+
+  async completeInternship(enrollmentId: string, user: any) {
+
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: { id: enrollmentId },
+      include: {
+        program: true,
+      },
+    });
+
+    if (!enrollment) {
+      throw new NotFoundException('Enrollment not found');
+    }
+
+    //  Mentor ownership check
+    if (enrollment.mentorId !== user.userId) {
+      throw new ForbiddenException('Not assigned mentor');
+    }
+
+    //  Status check
+    if (enrollment.status !== EnrollmentStatus.IN_PROGRESS) {
+      throw new BadRequestException('Internship not in progress');
+    }
+    if (
+      enrollment.status !== EnrollmentStatus.IN_PROGRESS &&
+      enrollment.status !== EnrollmentStatus.COMPLETED
+    ) {
+      throw new BadRequestException('Invalid status');
+    }
+
+    //  Get performance (REUSE)
+    const performance = await this.performanceService.getPerformance(
+      enrollmentId,
+      enrollment.internId
+    );
+
+    //  Minimum tasks rule
+    if (
+      performance.performance.approvedTasks <
+      enrollment.program.minimumTasksRequired
+    ) {
+      throw new BadRequestException(
+        `Minimum ${enrollment.program.minimumTasksRequired} approved tasks required`
+      );
+    }
+
+    //  Completion rule
+    if (performance.performance.completionPercentage < 45) {
+      throw new BadRequestException(
+        'Minimum 45% completion required'
+      );
+    }
+
+    // Grade rule
+    if (performance.performance.grade === 'Fail') {
+      throw new BadRequestException(
+        'Intern has failed. Cannot complete internship'
+      );
+    }
+
+    //  Update enrollment
+    await this.prisma.enrollment.update({
+      where: { id: enrollmentId },
+      data: {
+        status: 'COMPLETED',
+        completedAt: new Date(),
+      },
+    });
+
+    return {
+      message: 'Internship marked as completed',
+    };
   }
 }

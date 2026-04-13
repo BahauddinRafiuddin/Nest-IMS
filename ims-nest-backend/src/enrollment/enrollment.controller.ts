@@ -30,4 +30,13 @@ export class EnrollmentController {
   startInternship(@Param('id') id: string, @GetUser() user: any) {
     return this.enrollmentService.startInternship(id, user)
   }
+
+  @Patch('/:id/complete')
+  @Roles("MENTOR")
+  completeInternship(
+    @Param('id') id:string,
+    @GetUser() user:any
+  ){
+    return this.enrollmentService.completeInternship(id,user)
+  }
 }

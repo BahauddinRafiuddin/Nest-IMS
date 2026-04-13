@@ -7,10 +7,12 @@ import { UserModule } from './user/user.module';
 import { ProgramModule } from './program/program.module';
 import { EnrollmentModule } from './enrollment/enrollment.module';
 import { TaskModule } from './task/task.module';
+import { PerformanceModule } from './performance/performance.module';
+import { CertificateModule } from './certificate/certificate.module';
 
 
 @Module({
-  imports: [PrismaModule, AuthModule, CompanyModule, UserModule, ProgramModule,EnrollmentModule,TaskModule,
+  imports: [PrismaModule, AuthModule, CompanyModule, UserModule, ProgramModule,EnrollmentModule,TaskModule,PerformanceModule,
     ConfigModule.forRoot({
       isGlobal: true
     }),
@@ -19,6 +21,8 @@ import { TaskModule } from './task/task.module';
     ProgramModule,
     EnrollmentModule,
     TaskModule,
+    PerformanceModule,
+    CertificateModule,
   ],
 })
 export class AppModule { }

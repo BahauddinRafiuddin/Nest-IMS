@@ -112,7 +112,6 @@ export class TaskService {
   }
 
   async submitTask(data: SubmitTaskDto, user: any, taskId: string) {
-
     // Find task + include enrollment
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
@@ -255,7 +254,6 @@ export class TaskService {
   }
 
   async reviewTask(data: ReviewTaskDto, user: any, taskId: string) {
-
     // Get task with enrollment
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
