@@ -6,6 +6,7 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { SubmitTaskDto } from './dto/submit-task.dto';
+import { ReviewTaskDto } from './dto/review-task.dto';
 
 @Controller('task')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -27,12 +28,28 @@ export class TaskController {
     @Query('limit') limit = 5,
     @Query('status') status?: string,
   ) {
-    return this.taskService.getMyTasks(user,Number(page), Number(limit), status)
+    return this.taskService.getMyTasks(user, Number(page), Number(limit), status)
   }
 
   @Patch(':id/submit')
   @Roles("INTERN")
-  submitTask(@Body() body:SubmitTaskDto,@GetUser() user:any,@Param('id') taskId:string){
-    return this.taskService.submitTask(body,user,taskId)
+  submitTask(@Body() body: SubmitTaskDto, @GetUser() user: any, @Param('id') taskId: string) {
+    return this.taskService.submitTask(body, user, taskId)
+  }
+
+  @Get('/mentorTasks')
+  @Roles("MENTOR")
+  getMenotrTasks(@GetUser() user: any,
+    @Query('page') page = 1,
+    @Query('limit') limit = 5,
+    @Query('status') status?: string
+  ) {
+    return this.taskService.getMentorTasks(user, Number(page), Number(limit), status)
+  }
+
+  @Patch('/:id/review')
+  @Roles("MENTOR")
+  reviewTask(@Body() body: ReviewTaskDto, @GetUser() user: any, @Param('id') id: string) {
+    return this.taskService.reviewTask(body, user, id)
   }
 }

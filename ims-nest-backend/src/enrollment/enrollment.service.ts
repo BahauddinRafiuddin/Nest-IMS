@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateEnrollmentDto } from './dto/create-enrollment.dto';
 
@@ -57,41 +57,67 @@ export class EnrollmentService {
   }
 
   async myEnrollments(user: any) {
-  const enrollments = await this.prisma.enrollment.findMany({
-    where: {
-      internId: user.userId,
-      program: {
-        isActive: true 
-      }
-    },
-    include: {
-      program: {
-        select: {
-          id: true,
-          title: true,
-          domain: true,
-          durationInWeeks: true,
-          status: true,
-          type: true,
-          startDate: true,
-          endDate: true
-        },
+    const enrollments = await this.prisma.enrollment.findMany({
+      where: {
+        internId: user.userId,
+        program: {
+          isActive: true
+        }
       },
-      mentor: {
-        select: {
-          id: true,
-          name: true,
-          email: true
+      include: {
+        program: {
+          select: {
+            id: true,
+            title: true,
+            domain: true,
+            durationInWeeks: true,
+            status: true,
+            type: true,
+            startDate: true,
+            endDate: true
+          },
         },
-      }
-    },
-    orderBy: {
-      createdAt: 'desc'
-    },
-  });
+        mentor: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          },
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+    });
 
-  return {
-    enrollments
-  };
-}
+    return {
+      enrollments
+    };
+  }
+
+  async startInternship(enrollmentId: string, user: any) {
+    const enrollment = await this.prisma.enrollment.findUnique({
+      where: { id: enrollmentId }
+    })
+
+    if (!enrollment) throw new NotFoundException("Enrollmet Not Found!")
+
+    if (enrollment.internId !== user.userId) throw new ForbiddenException("Not Your Enrollment!")
+
+    if (enrollment.status === 'IN_PROGRESS') throw new BadRequestException("Internship Already Started!")
+
+    if (enrollment.paymentStatus === 'PENDING') throw new BadRequestException("Completed Payment First!")
+
+    const updated = await this.prisma.enrollment.update({
+      where: { id: enrollmentId },
+      data: {
+        status: "IN_PROGRESS"
+      }
+    })
+
+    return {
+      message: 'Internship started successfully',
+      enrollment: updated
+    }
+  }
 }
