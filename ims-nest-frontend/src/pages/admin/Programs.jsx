@@ -51,7 +51,7 @@ const Programs = () => {
       setPrograms(res.programs || []);
       setTotalPages(res.totalPages || 1);
     } catch (err) {
-      toastError(err.response?.data?.message || "Failed to load programs");
+      toastError(err?.message || "Failed to load programs");
     } finally {
       setLoading(false);
     }
@@ -76,21 +76,22 @@ const Programs = () => {
     }
   };
   const handleStatusChange = async (program) => {
-    let nextStatus = program.status === "upcoming" ? "active" : "completed";
-    if (nextStatus === "completed" && program.totalTasks < 10) {
-      toastError("Program must have at least 10 tasks before completing.");
+    let nextStatus = program.status === "UPCOMING" ? "ACTIVE" : "COMPLETED";
+    if (nextStatus === "COMPLETED" && program.totalTasks < program.minimumTasksRequired) {
+      toastError(`Program must have at least ${program.minimumTasksRequired} tasks before completing.`);
       return;
     }
     try {
-      await changeProgramStatus(program._id, nextStatus);
+      await changeProgramStatus(program.id, nextStatus);
       toastSuccess(`Program marked as ${nextStatus}`);
       fetchPrograms();
     } catch (err) {
-      toastError(err.response?.data?.message || "Status update failed");
+      toastError(err?.message || "Status update failed");
     }
   };
 
   if (loading) return <Loading />;
+  console.log(programs)
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-10">
@@ -203,15 +204,15 @@ const Programs = () => {
         <div className="grid grid-cols-1 gap-4">
           {programs.map((program) => (
             <div
-              key={program._id}
+              key={program.id}
               className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-indigo-200 transition-all duration-300"
             >
               {/* Status Side Accent */}
               <div
                 className={`absolute left-0 top-0 bottom-0 w-1.5 ${
-                  program.status === "active"
+                  program.status === "ACTIVE"
                     ? "bg-emerald-500"
-                    : program.status === "upcoming"
+                    : program.status === "UPCOMING"
                       ? "bg-amber-500"
                       : "bg-slate-400"
                 }`}
@@ -261,7 +262,7 @@ const Programs = () => {
                       icon={Tag}
                       label="Price"
                       value={
-                        program.type === "free" ? "Free" : `₹${program.price}`
+                        program.type === "FREE" ? "FREE" : `₹${program.price}`
                       }
                     />
                   </div>
@@ -296,7 +297,7 @@ const Programs = () => {
 
                 {/* Actions Section */}
                 <div className="flex flex-row lg:flex-col justify-center gap-3 shrink-0">
-                  {program.status === "upcoming" && (
+                  {program.status === "UPCOMING" && (
                     <ActionButton
                       onClick={() => setSelectedProgram(program)}
                       icon={UserPlus}
@@ -304,26 +305,26 @@ const Programs = () => {
                       variant="indigo"
                     />
                   )}
-                  {program.status !== "completed" && (
+                  {program.status !== "COMPLETED" && (
                     <>
                       <ActionButton
                         onClick={() =>
                           setConfirmData({
                             program,
                             nextStatus:
-                              program.status === "upcoming"
-                                ? "active"
-                                : "completed",
+                              program.status === "UPCOMING"
+                                ? "ACTIVE"
+                                : "COMPLETED",
                           })
                         }
                         icon={CheckCircle2}
                         label={
-                          program.status === "upcoming"
+                          program.status === "UPCOMING"
                             ? "Activate"
                             : "Complete"
                         }
                         variant={
-                          program.status === "upcoming" ? "blue" : "emerald"
+                          program.status === "UPCOMING" ? "blue" : "emerald"
                         }
                       />
                       <ActionButton

@@ -31,13 +31,21 @@ export class ProgramService {
     const diffInMs = end.getTime() - start.getTime();
     const durationInWeeks = Math.ceil(diffInMs / (1000 * 60 * 60 * 24 * 7));
 
+    if (data.type === 'FREE') {
+      data.price = 0;
+    }
+
+    if (data.type === 'PAID' && (!data.price || data.price <= 0)) {
+      throw new BadRequestException("Price must be greater than 0");
+    }
     const internshipProgram = await this.prisma.internshipProgram.create({
       data: {
         ...data,
         startDate: start,
         endDate: end,
         durationInWeeks,
-        companyId: user.companyId
+        companyId: user.companyId,
+        status:"UPCOMING"
       }
     })
 
@@ -60,9 +68,8 @@ export class ProgramService {
       companyId,
       ...(search && {
         OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          { domain: { contains: search, mode: 'insensitive' } },
-          { status: { equals: search.toUpperCase() as any } }, // enum
+          { title: { contains: search } },
+          { domain: { contains: search } },
         ],
       }),
     };
@@ -105,6 +112,13 @@ export class ProgramService {
       createdAt: p.createdAt,
       mentor: p.mentor,
       totalTasks: p._count.tasks,
+      durationInWeeks: p.durationInWeeks,
+      description: p.description,
+      startDate: p.startDate,
+      endDate: p.endDate,
+      price: p.price,
+      type: p.type,
+      minimumTasksRequired:p.minimumTasksRequired
     }));
 
     return {

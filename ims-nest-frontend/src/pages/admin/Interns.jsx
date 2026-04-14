@@ -32,6 +32,7 @@ const Interns = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
   const limit = 5;
+  const [newUserData,setNewUserData]=useState({})
 
   const [form, setForm] = useState({ name: "", email: "" });
 
@@ -67,6 +68,7 @@ const Interns = () => {
       setLoading(false);
     }
   };
+
   const handleStatusToggle = async (id, status) => {
     try {
       const res = await updateInternStatus(id, status);
@@ -98,11 +100,13 @@ const Interns = () => {
       setLoading(true);
       const res = await createIntern(form);
       toastSuccess(res.message);
+      setNewUserData(res.credentials)
+      console.log("Credentials",res.credentials)
       setForm({ name: "", email: "" });
       setShowForm(false);
       fetchData();
     } catch (err) {
-      toastError(err.response?.data?.message || "Creation failed");
+      toastError(err?.message || "Creation failed");
     } finally {
       setLoading(false);
     }
@@ -113,16 +117,16 @@ const Interns = () => {
   // Enrollment Status Badge Logic
   const getEnrollmentBadge = (status) => {
     const styles = {
-      approved: "bg-blue-50 text-blue-700 border-blue-100",
-      in_progress: "bg-amber-50 text-amber-700 border-amber-100",
-      completed: "bg-emerald-50 text-emerald-700 border-emerald-100",
+      APPROVED: "bg-blue-50 text-blue-700 border-blue-100",
+      IN_PROGRESS: "bg-amber-50 text-amber-700 border-amber-100",
+      COMPLETED: "bg-emerald-50 text-emerald-700 border-emerald-100",
       cancelled: "bg-rose-50 text-rose-700 border-rose-100",
       none: "bg-slate-50 text-slate-500 border-slate-100",
     };
     const labels = {
-      approved: "Upcoming",
-      in_progress: "Active",
-      completed: "Alumni",
+      APPROVED: "Upcoming",
+      IN_PROGRESS: "Active",
+      COMPLETED: "Alumni",
       cancelled: "Dropped",
       none: "Unenrolled",
     };

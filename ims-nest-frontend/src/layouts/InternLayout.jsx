@@ -9,7 +9,7 @@ const InternLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user } = useAuth();
 
-if (user?.role !== "intern") {
+if (user?.role !== "INTERN") {
   return <Navigate to="/login" replace />;
 }
   return (

@@ -6,7 +6,7 @@ export const getMyProfile = async () => {
 };
 
 export const changePassword = async (data) => {
-  const res = await api.put("/user/update-pass", data);
+  const res = await api.patch("/auth/change-password", data);
   return res.data;
 };
 

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toastError } from "../utils/toast";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -30,12 +31,17 @@ api.interceptors.response.use(
       const { status } = error.response;
 
       if (status === 401) {
-        localStorage.clear();
-        window.location.href = "/login";
+        // ❗ Only redirect if user is already logged in
+        const token = localStorage.getItem("token");
+
+        if (token) {
+          localStorage.clear();
+          window.location.href = "/login";
+        }
       }
 
       if (status === 403) {
-        console.error("Access denied");
+        toastError("Access denied");
       }
     }
 

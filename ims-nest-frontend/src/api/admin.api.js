@@ -18,7 +18,7 @@ export const getDashboardData = async () => {
 }
 
 export const getAllInterns = async (page, limit, search) => {
-  const res = await api.get(`/admin/interns?page=${page}&limit=${limit}&search=${search}`);
+  const res = await api.get(`/user/interns?page=${page}&limit=${limit}&search=${search}`);
   return res.data;
 }
 
@@ -39,13 +39,13 @@ export const exportInternsApi = async (search, format) => {
 }
 
 export const getAllMentors = async (page, limit, search) => {
-  const res = await api.get(`/admin/mentors?page=${page}&limit=${limit}&search=${search}`)
+  const res = await api.get(`/user/mentors?page=${page}&limit=${limit}&search=${search}`)
   return res.data
 }
 
 // get mentors to assign the programs
 export const getAvailableMentors=async () => {
-  const res=await api.get('/admin/availableMentors')
+  const res=await api.get('/user/availableMentors')
   return res.data
 }
 
@@ -98,12 +98,12 @@ export const assignMentor = async (internId, mentorId) => {
 }
 
 export const createMentor = async (data) => {
-  const res = await api.post("/admin/mentor", data)
+  const res = await api.post("/user/mentor", data)
   return res.data
 }
 
 export const createIntern = async (data) => {
-  const res = await api.post('/admin/intern', data)
+  const res = await api.post('/user/intern', data)
   return res.data
 }
 

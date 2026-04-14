@@ -1,7 +1,7 @@
 import api from "./axios"
 
 export const getAllPrograms = async (page, limit, search) => {
-  const res = await api.get(`/admin/programs?page=${page}&limit=${limit}&search=${search}`)
+  const res = await api.get(`/program?page=${page}&limit=${limit}&search=${search}`)
   return res.data
 }
 
@@ -22,26 +22,26 @@ export const exportProgramsApi = async (search, format) => {
 }
 
 export const createProgram = async (data) => {
-  const res = await api.post('/programs', data)
+  const res = await api.post('/program', data)
   return res.data
 }
 
 export const changeProgramStatus = async (progId, status) => {
-  const res = await api.put(`/admin/program/${progId}/status`, { changedStatus: status })
+  const res = await api.patch(`/program/${progId}/status`, { changedStatus: status })
   return res.data
 }
 
 export const updateProgram = async (progId, data) => {
-  const res = await api.put(`/admin/program/${progId}`, data)
+  const res = await api.patch(`/program/${progId}`, data)
   return res.data
 }
 
 export const enrollIntern = async (internId, programId) => {
-  const res = await api.post(`/enrollments`, { internId,programId })
+  const res = await api.post(`/enrollment/enroll`, { internId,programId })
   return res.data
 };
 
 export const getAvailableInterns = async () => {
-  const res = await api.get("/admin/available-interns");
+  const res = await api.get("/user/availableInterns");
   return res.data;
 };

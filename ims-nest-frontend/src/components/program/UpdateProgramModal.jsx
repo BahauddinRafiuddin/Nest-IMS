@@ -68,9 +68,9 @@ const UpdateProgramModal = ({ program, onClose, refresh }) => {
     if (!form.startDate) newErrors.startDate = "Start date is required";
     if (!form.endDate) newErrors.endDate = "End date is required";
 
-    if (!form.description.trim()) newErrors.description = "Description is required";
-    else if (form.description.length < 10) newErrors.description = "Minimum 10 characters required";
-    else if (form.description.length > 500) newErrors.description = "Maximum 500 characters allowed";
+    // if (!form.description.trim()) newErrors.description = "Description is required";
+    // else if (form.description.length < 10) newErrors.description = "Minimum 10 characters required";
+    // else if (form.description.length > 500) newErrors.description = "Maximum 500 characters allowed";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -99,7 +99,7 @@ const UpdateProgramModal = ({ program, onClose, refresh }) => {
     if (!validate()) return;
     try {
       setLoading(true);
-      const res = await updateProgram(program._id, form);
+      const res = await updateProgram(program.id, form);
       toastSuccess(res.message);
       refresh();
       onClose();

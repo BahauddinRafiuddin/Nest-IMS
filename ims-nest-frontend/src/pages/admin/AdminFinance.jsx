@@ -83,7 +83,7 @@ const AdminFinance = () => {
     return <Loading />;
   }
 
-  const { summary, transactions, commissionBreakdown, pagination } = data;
+  const { summary, transactions, commissionBreakdown, pagination } = data||[];
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-10">
@@ -111,25 +111,25 @@ const AdminFinance = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Gross Revenue"
-          value={`₹${summary.totalRevenue.toLocaleString()}`}
+          value={`₹${summary?.totalRevenue.toLocaleString()}`}
           icon={IndianRupee}
           color="bg-indigo-600"
         />
         <StatCard
           title="Platform Fees"
-          value={`₹${summary.totalCommission.toLocaleString()}`}
+          value={`₹${summary?.totalCommission.toLocaleString()}`}
           icon={TrendingUp}
           color="bg-violet-600"
         />
         <StatCard
           title="Company Net"
-          value={`₹${summary.totalCompanyEarning.toLocaleString()}`}
+          value={`₹${summary?.totalCompanyEarning.toLocaleString()}`}
           icon={Wallet}
           color="bg-emerald-600"
         />
         <StatCard
           title="Volume"
-          value={summary.totalTransactions}
+          value={summary?.totalTransactions}
           icon={Repeat}
           color="bg-slate-800"
         />
@@ -320,7 +320,7 @@ const AdminFinance = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {transactions.map((txn) => (
+              {transactions?.map((txn) => (
                 <tr
                   key={txn._id}
                   className="hover:bg-slate-50/80 transition-colors group"
@@ -361,7 +361,7 @@ const AdminFinance = () => {
               ))}
             </tbody>
           </table>
-          {transactions.length === 0 && (
+          {transactions?.length === 0 && (
             <div className="py-20 text-center text-slate-400">
               <History size={40} className="mx-auto mb-3 opacity-20" />
               <p>No financial records match your filters.</p>

@@ -7,8 +7,7 @@ const ChangePasswordModal = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
 
-  const passwordRegex =
-    /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
   const [form, setForm] = useState({
     currentPassword: "",
@@ -33,8 +32,9 @@ const ChangePasswordModal = ({ onClose }) => {
     if (!form.newPassword) {
       err.newPassword = "New password required";
     } else if (!passwordRegex.test(form.newPassword)) {
-      err.newPassword =
-        "Min 8 chars, 1 capital, 1 number, 1 symbol";
+      err.newPassword = "Min 8 chars, 1 capital, 1 number, 1 symbol";
+    } else if (form.currentPassword === form.newPassword) {
+      err.newPassword = "New password must be different from current password";
     }
 
     if (!form.confirmPassword) {
@@ -54,14 +54,12 @@ const ChangePasswordModal = ({ onClose }) => {
 
     try {
       setLoading(true);
-      const res = await changePassword(form);
+      const { confirmPassword, ...payload } = form;
+      const res = await changePassword(payload);
       toastSuccess(res.message);
       onClose();
     } catch (err) {
-      toastError(
-        err.response?.data?.message ||
-          "Failed to change password"
-      );
+      toastError(err?.message || "Failed to change password");
     } finally {
       setLoading(false);
     }
@@ -70,7 +68,6 @@ const ChangePasswordModal = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
-
         <button
           onClick={onClose}
           disabled={loading}
@@ -84,7 +81,6 @@ const ChangePasswordModal = ({ onClose }) => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-
           <InputField
             label="Current Password"
             name="currentPassword"
@@ -120,27 +116,16 @@ const ChangePasswordModal = ({ onClose }) => {
             disabled={loading}
             className="cursor-pointer w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl font-medium transition disabled:opacity-60 flex items-center justify-center gap-2"
           >
-            {loading && (
-              <Loader2 size={18} className="animate-spin" />
-            )}
+            {loading && <Loader2 size={18} className="animate-spin" />}
             {loading ? "Updating..." : "Update Password"}
           </button>
-
         </form>
       </div>
     </div>
   );
 };
 
-const InputField = ({
-  label,
-  name,
-  value,
-  onChange,
-  show,
-  toggle,
-  error,
-}) => (
+const InputField = ({ label, name, value, onChange, show, toggle, error }) => (
   <div>
     <label className="text-sm font-medium">{label}</label>
 
@@ -166,9 +151,7 @@ const InputField = ({
       </button>
     </div>
 
-    {error && (
-      <p className="text-red-500 text-xs mt-1">{error}</p>
-    )}
+    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
   </div>
 );
 

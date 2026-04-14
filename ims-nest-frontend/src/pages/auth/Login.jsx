@@ -46,9 +46,8 @@ const Login = () => {
     try {
       setLoading(true);
       const data = await loginUser(form);
-      console.log("role",data.user.role)
+      console.log("role", data.user.role);
       login(data);
-
 
       toastSuccess("Login successful");
       if (data.user.forcePasswordChange) {
@@ -57,14 +56,17 @@ const Login = () => {
       }
 
       const role = data.user?.role || data.role;
-      console.log(role)
+      console.log(role);
       if (role === "SUPER_ADMIN") navigate("/superadmin");
       else if (role === "ADMIN") navigate("/admin");
       else if (role === "MENTOR") navigate("/mentor");
-      else if(role === "PUBLIC_USER") navigate("/public_user", { replace: true })
+      else if (role === "PUBLIC_USER")
+        navigate("/public_user", { replace: true });
       else navigate("/intern");
     } catch (err) {
-      toastError(err.response?.data?.message || "Login failed");
+      toastError(
+        err?.response?.data?.message || err?.message || "Login failed",
+      );
     } finally {
       setLoading(false);
     }
@@ -126,14 +128,17 @@ const Login = () => {
                   value={form.email}
                   onChange={handleChange}
                   className={`w-full pl-11 pr-4 py-3 bg-slate-50 border rounded-xl text-sm font-medium outline-none transition-all
-                    ${errors.email 
-                      ? "border-red-300 focus:ring-4 focus:ring-red-500/5 focus:border-red-500" 
-                      : "border-slate-200 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white hover:border-slate-300"
+                    ${
+                      errors.email
+                        ? "border-red-300 focus:ring-4 focus:ring-red-500/5 focus:border-red-500"
+                        : "border-slate-200 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white hover:border-slate-300"
                     }`}
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 font-bold text-[10px] mt-1 ml-2">{errors.email}</p>
+                <p className="text-red-500 font-bold text-[10px] mt-1 ml-2">
+                  {errors.email}
+                </p>
               )}
             </div>
 
@@ -154,9 +159,10 @@ const Login = () => {
                   value={form.password}
                   onChange={handleChange}
                   className={`w-full pl-11 pr-12 py-3 bg-slate-50 border rounded-xl text-sm font-medium outline-none transition-all
-                    ${errors.password 
-                      ? "border-red-300 focus:ring-4 focus:ring-red-500/5 focus:border-red-500" 
-                      : "border-slate-200 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white hover:border-slate-300"
+                    ${
+                      errors.password
+                        ? "border-red-300 focus:ring-4 focus:ring-red-500/5 focus:border-red-500"
+                        : "border-slate-200 focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 focus:bg-white hover:border-slate-300"
                     }`}
                 />
                 <button
@@ -168,7 +174,9 @@ const Login = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-500 font-bold text-[10px] mt-1 ml-2">{errors.password}</p>
+                <p className="text-red-500 font-bold text-[10px] mt-1 ml-2">
+                  {errors.password}
+                </p>
               )}
             </div>
 
@@ -179,9 +187,24 @@ const Login = () => {
             >
               {loading ? (
                 <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
                   </svg>
                   Authenticating...
                 </span>
@@ -193,7 +216,10 @@ const Login = () => {
 
           <p className="text-slate-500 text-center mt-8 text-sm font-medium">
             Don’t have an account?{" "}
-            <Link to="/register" className="text-indigo-600 font-bold hover:underline underline-offset-4 cursor-pointer transition-all">
+            <Link
+              to="/register"
+              className="text-indigo-600 font-bold hover:underline underline-offset-4 cursor-pointer transition-all"
+            >
               Create an account
             </Link>
           </p>

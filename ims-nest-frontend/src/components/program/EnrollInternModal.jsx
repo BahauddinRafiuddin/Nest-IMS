@@ -34,7 +34,7 @@ const EnrollInternModal = ({ program, onClose, refresh }) => {
   try {
     setLoading(true);
 
-    const res = await enrollIntern(internId,program._id);
+    const res = await enrollIntern(internId,program.id);
 
     toastSuccess(res.message);
 
@@ -74,7 +74,7 @@ const EnrollInternModal = ({ program, onClose, refresh }) => {
           <option value="">Select Intern</option>
 
           {interns.map((intern) => (
-            <option key={intern._id} value={intern._id}>
+            <option key={intern.id} value={intern.id}>
               {intern.name} ({intern.email})
             </option>
           ))}
@@ -84,14 +84,14 @@ const EnrollInternModal = ({ program, onClose, refresh }) => {
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 border rounded hover:bg-gray-100"
+            className="px-4 py-2 border rounded hover:bg-gray-100 cursor-pointer"
           >
             Cancel
           </button>
 
           <button
             disabled={loading}
-            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
+            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60 cursor-pointer"
           >
             {loading ? "Enrolling..." : "Enroll"}
           </button>

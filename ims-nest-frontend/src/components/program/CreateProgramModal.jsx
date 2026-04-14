@@ -2,15 +2,15 @@ import { useEffect, useState } from "react";
 import { createProgram } from "../../api/program.api";
 import { getAvailableMentors } from "../../api/admin.api";
 import { toastError, toastSuccess } from "../../utils/toast";
-import { 
-  X, 
-  BookOpen, 
-  User, 
-  Calendar, 
-  IndianRupee, 
-  ClipboardList, 
+import {
+  X,
+  BookOpen,
+  User,
+  Calendar,
+  IndianRupee,
+  ClipboardList,
   FileText,
-  Info
+  Info,
 } from "lucide-react";
 
 const domains = [
@@ -31,12 +31,12 @@ const CreateProgram = ({ onClose, refresh }) => {
     title: "",
     domain: "",
     description: "",
-    mentor: "",
+    mentorId: "",
     durationInWeeks: "",
     minimumTasksRequired: "",
     startDate: "",
     endDate: "",
-    type: "free",
+    type: "FREE",
     price: 0,
     rules: "",
   });
@@ -55,7 +55,6 @@ const CreateProgram = ({ onClose, refresh }) => {
     loadMentors();
   }, []);
 
-  console.log(mentors)
   const calculateDuration = (start, end) => {
     const s = new Date(start);
     const e = new Date(end);
@@ -78,14 +77,16 @@ const CreateProgram = ({ onClose, refresh }) => {
     const err = {};
     if (!form.title.trim()) err.title = "Program title is required";
     if (!form.domain) err.domain = "Domain is required";
-    if (!form.mentor) err.mentor = "Mentor selection is required";
-    if (!form.minimumTasksRequired) err.minimumTasksRequired = "Specify MinimumTasks it is required";
-    if (form.minimumTasksRequired > 30) err.minimumTasksRequired = "Not More Than 30";
+    if (!form.mentorId) err.mentor = "Mentor selection is required";
+    if (!form.minimumTasksRequired)
+      err.minimumTasksRequired = "Specify MinimumTasks it is required";
+    if (form.minimumTasksRequired > 30)
+      err.minimumTasksRequired = "Not More Than 30";
     if (!form.startDate) err.startDate = "Start date is required";
     if (!form.endDate) err.endDate = "End date is required";
     if (!form.description.trim()) err.description = "Description is required";
     if (!form.rules.trim()) err.rules = "Rules are required";
-    if (form.type === "paid" && (!form.price || form.price <= 0)) {
+    if (form.type === "PAID" && (!form.price || form.price <= 0)) {
       err.price = "Price must be greater than 0";
     }
     setErrors(err);
@@ -95,7 +96,11 @@ const CreateProgram = ({ onClose, refresh }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updated = { ...form, [name]: value };
-    if ((name === "startDate" || name === "endDate") && updated.startDate && updated.endDate) {
+    if (
+      (name === "startDate" || name === "endDate") &&
+      updated.startDate &&
+      updated.endDate
+    ) {
       if (new Date(updated.endDate) <= new Date(updated.startDate)) {
         toastError("End date must be after start date");
         return;
@@ -103,7 +108,7 @@ const CreateProgram = ({ onClose, refresh }) => {
       const weeks = calculateDuration(updated.startDate, updated.endDate);
       if (weeks > 0) updated.durationInWeeks = weeks;
     }
-    if (name === "type" && value === "free") {
+    if (name === "type" && value === "FREE") {
       updated.price = 0;
     }
     setForm(updated);
@@ -114,12 +119,14 @@ const CreateProgram = ({ onClose, refresh }) => {
     if (!validate()) return;
     try {
       setLoading(true);
-      await createProgram(form);
+      const { durationInWeeks, ...payload } = form;
+      console.log(payload)
+      await createProgram(payload);
       toastSuccess("Program created successfully");
       refresh();
       onClose();
     } catch (err) {
-      toastError(err.response?.data?.message || "Failed to create program");
+      toastError(err?.message || "Failed to create program");
     } finally {
       setLoading(false);
     }
@@ -134,8 +141,12 @@ const CreateProgram = ({ onClose, refresh }) => {
         {/* HEADER */}
         <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
           <div>
-            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Create Program</h2>
-            <p className="text-slate-500 text-sm font-medium mt-1">Design a new internship experience for your students.</p>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">
+              Create Program
+            </h2>
+            <p className="text-slate-500 text-sm font-medium mt-1">
+              Design a new internship experience for your students.
+            </p>
           </div>
           <button
             type="button"
@@ -148,53 +159,78 @@ const CreateProgram = ({ onClose, refresh }) => {
 
         {/* BODY */}
         <div className="px-8 py-8 space-y-10 overflow-y-auto custom-scrollbar">
-          
           {/* SECTION 1: GENERAL INFO */}
           <section className="space-y-6">
             <div className="flex items-center gap-2 border-l-4 border-indigo-600 pl-3">
               <BookOpen size={20} className="text-indigo-600" />
-              <h3 className="font-bold text-slate-700 uppercase tracking-wider text-sm">Basic Information</h3>
+              <h3 className="font-bold text-slate-700 uppercase tracking-wider text-sm">
+                Basic Information
+              </h3>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
-                <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Program Title</label>
+                <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">
+                  Program Title
+                </label>
                 <input
                   name="title"
                   value={form.title}
                   onChange={handleChange}
                   placeholder="e.g. Full Stack Web Development Immersive"
-                  className={`w-full bg-slate-50 border ${errors.title ? 'border-red-500' : 'border-slate-200'} rounded-2xl px-5 py-3.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-medium`}
+                  className={`w-full bg-slate-50 border ${errors.title ? "border-red-500" : "border-slate-200"} rounded-2xl px-5 py-3.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-medium`}
                 />
-                {errors.title && <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.title}</p>}
+                {errors.title && (
+                  <p className="text-red-500 text-xs mt-1.5 ml-1">
+                    {errors.title}
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Domain</label>
+                <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">
+                  Domain
+                </label>
                 <select
                   name="domain"
                   value={form.domain}
                   onChange={handleChange}
-                  className={`w-full bg-slate-50 border ${errors.domain ? 'border-red-500' : 'border-slate-200'} rounded-2xl px-5 py-3.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-bold cursor-pointer appearance-none`}
+                  className={`w-full bg-slate-50 border ${errors.domain ? "border-red-500" : "border-slate-200"} rounded-2xl px-5 py-3.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-bold cursor-pointer appearance-none`}
                 >
                   <option value="">Select domain</option>
-                  {domains.map((d) => <option key={d}>{d}</option>)}
+                  {domains.map((d) => (
+                    <option key={d}>{d}</option>
+                  ))}
                 </select>
-                {errors.domain && <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.domain}</p>}
+                {errors.domain && (
+                  <p className="text-red-500 text-xs mt-1.5 ml-1">
+                    {errors.domain}
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Assign Mentor</label>
+                <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">
+                  Assign Mentor
+                </label>
                 <select
-                  name="mentor"
-                  value={form.mentor}
+                  name="mentorId"
+                  value={form.mentorId}
                   onChange={handleChange}
-                  className={`w-full bg-slate-50 border ${errors.mentor ? 'border-red-500' : 'border-slate-200'} rounded-2xl px-5 py-3.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-bold cursor-pointer appearance-none`}
+                  className={`w-full bg-slate-50 border ${errors.mentor ? "border-red-500" : "border-slate-200"} rounded-2xl px-5 py-3.5 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-bold cursor-pointer appearance-none`}
                 >
                   <option value="">Select mentor</option>
-                  {mentors.map((m) => <option key={m._id} value={m._id}>{m.name}</option>)}
+                  {mentors.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
                 </select>
-                {errors.mentor && <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.mentor}</p>}
+                {errors.mentor && (
+                  <p className="text-red-500 text-xs mt-1.5 ml-1">
+                    {errors.mentor}
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -203,12 +239,16 @@ const CreateProgram = ({ onClose, refresh }) => {
           <section className="space-y-6">
             <div className="flex items-center gap-2 border-l-4 border-emerald-500 pl-3">
               <Calendar size={20} className="text-emerald-500" />
-              <h3 className="font-bold text-slate-700 uppercase tracking-wider text-sm">Schedule & Tasks</h3>
+              <h3 className="font-bold text-slate-700 uppercase tracking-wider text-sm">
+                Schedule & Tasks
+              </h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-6 rounded-4xl border border-slate-100">
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Start Date</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                  Start Date
+                </label>
                 <input
                   type="date"
                   name="startDate"
@@ -220,7 +260,9 @@ const CreateProgram = ({ onClose, refresh }) => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">End Date</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                  End Date
+                </label>
                 <input
                   type="date"
                   name="endDate"
@@ -232,16 +274,23 @@ const CreateProgram = ({ onClose, refresh }) => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Duration</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                  Duration
+                </label>
                 <div className="w-full bg-slate-200/50 border border-slate-200 rounded-xl px-4 py-2.5 font-black text-slate-600 text-center">
                   {form.durationInWeeks || 0} Weeks
                 </div>
               </div>
 
               <div className="md:col-span-3">
-                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Minimum Tasks for Completion</label>
+                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                  Minimum Tasks for Completion
+                </label>
                 <div className="relative">
-                  <ClipboardList className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <ClipboardList
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                    size={18}
+                  />
                   <input
                     type="number"
                     name="minimumTasksRequired"
@@ -251,7 +300,11 @@ const CreateProgram = ({ onClose, refresh }) => {
                     className="w-full bg-white border border-slate-200 rounded-xl pl-12 pr-4 py-2.5 focus:ring-2 focus:ring-emerald-500/20 outline-none font-bold"
                   />
                 </div>
-                {errors.minimumTasksRequired && <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.minimumTasksRequired}</p>}
+                {errors.minimumTasksRequired && (
+                  <p className="text-red-500 text-xs mt-1.5 ml-1">
+                    {errors.minimumTasksRequired}
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -260,31 +313,39 @@ const CreateProgram = ({ onClose, refresh }) => {
           <section className="space-y-6">
             <div className="flex items-center gap-2 border-l-4 border-amber-500 pl-3">
               <IndianRupee size={20} className="text-amber-500" />
-              <h3 className="font-bold text-slate-700 uppercase tracking-wider text-sm">Pricing Model</h3>
+              <h3 className="font-bold text-slate-700 uppercase tracking-wider text-sm">
+                Pricing Model
+              </h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex p-1 bg-slate-100 rounded-2xl">
                 <button
                   type="button"
-                  onClick={() => handleChange({ target: { name: 'type', value: 'free' } })}
-                  className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${form.type === 'free' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500'} cursor-pointer`}
+                  onClick={() =>
+                    handleChange({ target: { name: "type", value: "FREE" } })
+                  }
+                  className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${form.type === "FREE" ? "bg-white shadow-sm text-indigo-600" : "text-slate-500"} cursor-pointer`}
                 >
                   Free Program
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleChange({ target: { name: 'type', value: 'paid' } })}
-                  className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${form.type === 'paid' ? 'bg-white shadow-sm text-amber-600' : 'text-slate-500'} cursor-pointer`}
+                  onClick={() =>
+                    handleChange({ target: { name: "type", value: "PAID" } })
+                  }
+                  className={`flex-1 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${form.type === "PAID" ? "bg-white shadow-sm text-amber-600" : "text-slate-500"} cursor-pointer`}
                 >
                   Paid Program
                 </button>
               </div>
 
-              {form.type === "paid" && (
+              {form.type === "PAID" && (
                 <div className="animate-in slide-in-from-left-4 duration-300">
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">₹</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">
+                      ₹
+                    </span>
                     <input
                       type="number"
                       name="price"
@@ -294,7 +355,11 @@ const CreateProgram = ({ onClose, refresh }) => {
                       className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 outline-none font-black"
                     />
                   </div>
-                  {errors.price && <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.price}</p>}
+                  {errors.price && (
+                    <p className="text-red-500 text-xs mt-1.5 ml-1">
+                      {errors.price}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -304,12 +369,16 @@ const CreateProgram = ({ onClose, refresh }) => {
           <section className="space-y-6">
             <div className="flex items-center gap-2 border-l-4 border-slate-800 pl-3">
               <FileText size={20} className="text-slate-800" />
-              <h3 className="font-bold text-slate-700 uppercase tracking-wider text-sm">Program Content</h3>
+              <h3 className="font-bold text-slate-700 uppercase tracking-wider text-sm">
+                Program Content
+              </h3>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">About the Program</label>
+                <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">
+                  About the Program
+                </label>
                 <textarea
                   rows={4}
                   name="description"
@@ -318,11 +387,17 @@ const CreateProgram = ({ onClose, refresh }) => {
                   placeholder="Detailed overview of what students will learn..."
                   className="w-full bg-slate-50 border border-slate-200 rounded-3xl px-6 py-4 focus:ring-4 focus:ring-slate-500/10 focus:border-slate-800 outline-none transition-all font-medium resize-none"
                 />
-                {errors.description && <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.description}</p>}
+                {errors.description && (
+                  <p className="text-red-500 text-xs mt-1.5 ml-1">
+                    {errors.description}
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Rules & Expectations</label>
+                <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">
+                  Rules & Expectations
+                </label>
                 <textarea
                   rows={4}
                   name="rules"
@@ -331,7 +406,11 @@ const CreateProgram = ({ onClose, refresh }) => {
                   placeholder="Guidelines, attendance policy, submission rules..."
                   className="w-full bg-slate-50 border border-slate-200 rounded-3xl px-6 py-4 focus:ring-4 focus:ring-slate-500/10 focus:border-slate-800 outline-none transition-all font-medium resize-none"
                 />
-                {errors.rules && <p className="text-red-500 text-xs mt-1.5 ml-1">{errors.rules}</p>}
+                {errors.rules && (
+                  <p className="text-red-500 text-xs mt-1.5 ml-1">
+                    {errors.rules}
+                  </p>
+                )}
               </div>
             </div>
           </section>
@@ -358,7 +437,9 @@ const CreateProgram = ({ onClose, refresh }) => {
       </form>
 
       {/* CSS for custom scrollbar */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
@@ -372,7 +453,9 @@ const CreateProgram = ({ onClose, refresh }) => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #cbd5e1;
         }
-      `}} />
+      `,
+        }}
+      />
     </div>
   );
 };

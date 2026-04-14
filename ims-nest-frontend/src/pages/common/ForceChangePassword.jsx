@@ -5,7 +5,6 @@ import { toastError, toastSuccess } from "../../utils/toast";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 
-
 const ForceChangePassword = () => {
   const navigate = useNavigate();
   const { user } = useAuth(); // get logged-in user
@@ -13,8 +12,7 @@ const ForceChangePassword = () => {
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
 
-  const passwordRegex =
-    /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
 
   const [form, setForm] = useState({
     currentPassword: "",
@@ -39,8 +37,9 @@ const ForceChangePassword = () => {
     if (!form.newPassword) {
       err.newPassword = "New password required";
     } else if (!passwordRegex.test(form.newPassword)) {
-      err.newPassword =
-        "Min 8 chars, 1 capital, 1 number, 1 symbol";
+      err.newPassword = "Min 8 chars, 1 capital, 1 number, 1 symbol";
+    } else if (form.currentPassword === form.newPassword) {
+      err.newPassword = "New password must be different from current password";
     }
 
     if (!form.confirmPassword) {
@@ -67,14 +66,12 @@ const ForceChangePassword = () => {
 
     try {
       setLoading(true);
-      const res = await changePassword(form);
+      const { confirmPassword, ...payload } = form;
+      const res = await changePassword(payload);
       toastSuccess(res.message);
       redirectByRole();
     } catch (err) {
-      toastError(
-        err.response?.data?.message ||
-          "Failed to change password"
-      );
+      toastError(err?.message || "Failed to change password");
     } finally {
       setLoading(false);
     }
@@ -82,21 +79,18 @@ const ForceChangePassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-
       <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8">
-
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-bold text-gray-800">
             Change Your Password
           </h2>
           <p className="text-sm text-gray-500 mt-2">
-            For security reasons, you must change your
-            password before continuing.
+            For security reasons, you must change your password before
+            continuing.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-
           <InputField
             label="Current Password"
             name="currentPassword"
@@ -132,28 +126,16 @@ const ForceChangePassword = () => {
             disabled={loading}
             className="cursor-pointer w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-medium transition disabled:opacity-60 flex items-center justify-center gap-2"
           >
-            {loading && (
-              <Loader2 size={18} className="animate-spin" />
-            )}
+            {loading && <Loader2 size={18} className="animate-spin" />}
             {loading ? "Updating..." : "Update Password"}
           </button>
-
         </form>
-
       </div>
     </div>
   );
 };
 
-const InputField = ({
-  label,
-  name,
-  value,
-  onChange,
-  show,
-  toggle,
-  error,
-}) => (
+const InputField = ({ label, name, value, onChange, show, toggle, error }) => (
   <div>
     <label className="text-sm font-medium">{label}</label>
 
@@ -177,9 +159,7 @@ const InputField = ({
       </button>
     </div>
 
-    {error && (
-      <p className="text-red-500 text-xs mt-1">{error}</p>
-    )}
+    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
   </div>
 );
 

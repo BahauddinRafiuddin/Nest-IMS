@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { JwtService } from "@nestjs/jwt";
 import { RegisterDto } from "./dto/register.dto";
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from "./dto/login.dto";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 
 @Injectable()
 export class AuthService {
@@ -23,7 +24,7 @@ export class AuthService {
     const hashPassword = await bcrypt.hash(password, 10)
     const user = await this.prisma.user.create({
       data: {
-        name, email, password: hashPassword, role: 'PUBLIC_USER',forcePasswordChange:false
+        name, email, password: hashPassword, role: 'PUBLIC_USER', forcePasswordChange: false
       }
     })
 
@@ -64,14 +65,75 @@ export class AuthService {
     return {
       message: 'Login successful',
       access_token: token,
-      user:{
-        id:user.id,
-        name:user.name,
-        email:user.email,
-        role:user.role,
-        companyId:user.companyId,
-        forcePasswordChange:user.forcePasswordChange
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        companyId: user.companyId,
+        forcePasswordChange: user.forcePasswordChange
       }
+    };
+  }
+
+  async getMe(user: any) {
+    const current_user = await this.prisma.user.findFirst({
+      where: { id: user.userId }
+    })
+
+    if (!current_user) throw new BadRequestException("User Not Found!")
+
+    return {
+      message: "User Fetch Successfully",
+      user: {
+        id: current_user.id,
+        email: current_user.email,
+        role: current_user.role,
+        name: current_user.name
+      }
+    }
+  }
+
+  async changePassword(userId: string, data: ChangePasswordDto) {
+
+    const currentUser = await this.prisma.user.findUnique({
+      where: { id: userId }, 
+      select: {
+        password: true
+      }
+    });
+
+    if (!currentUser) {
+      throw new NotFoundException("User not found");
+    }
+
+    const isMatch = await bcrypt.compare(
+      data.currentPassword,
+      currentUser.password
+    );
+
+    if (!isMatch) {
+      throw new BadRequestException("Current password is incorrect");
+    }
+
+    if (data.currentPassword === data.newPassword) {
+      throw new BadRequestException(
+        "New password must be different from current password"
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(data.newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: hashedPassword,
+        forcePasswordChange: false, 
+      },
+    });
+
+    return {
+      message: "Password changed successfully",
     };
   }
 
