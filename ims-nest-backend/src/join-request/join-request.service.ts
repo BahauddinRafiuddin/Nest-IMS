@@ -92,4 +92,31 @@ export class JoinRequestService {
     };
   }
 
+  // Public user join requests
+  async getPublicUserJoinRequests(user:any){
+    const requests=await this.prisma.joinRequest.findMany({
+      where:{userId:user.userId},
+      include:{
+        company:{
+          select:{
+            id:true,
+            name:true,
+            email:true
+          }
+        },
+        program:{
+          select:{
+            id:true,
+            title:true
+          }
+        }
+      },
+      orderBy:{
+        createdAt:'desc'
+      }
+    })
+
+    return {requests}
+  }
+
 }

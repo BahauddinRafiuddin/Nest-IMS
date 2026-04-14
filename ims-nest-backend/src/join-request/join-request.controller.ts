@@ -25,4 +25,10 @@ export class JoinRequestController {
       user.companyId
     );
   }
+
+  @Get('my')
+  @Roles(Role.PUBLIC_USER)
+  getPublicUserJoinRequest(@GetUser() user:any){
+    return this.joinRequestService.getPublicUserJoinRequests(user)
+  }
 }
