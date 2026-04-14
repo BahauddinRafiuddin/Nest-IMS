@@ -50,7 +50,7 @@ export const getAvailableMentors=async () => {
 }
 
 export const getCompanyReviews = async (page, limit, minRating) => {
-  const res = await api.get(`/admin/reviews?page=${page}&limit=${limit}&minRating=${minRating}`)
+  const res = await api.get(`/company/reviews?page=${page}&limit=${limit}&minRating=${minRating}`)
   return res.data
 }
 

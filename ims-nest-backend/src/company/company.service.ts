@@ -61,4 +61,39 @@ export class CompanyService {
       }
     })
   }
+
+  async getCompanyReviews(companyId: string, page: number, limit: number, rating: number) {
+    const skip = (page - 1) * limit
+    let where: any = {
+      companyId,
+      status: "ACCEPTED"
+    }
+
+    if (rating) {
+      where.rating = { gt: Number(rating) };
+    }
+
+    const total = await this.prisma.review.count({ where })
+    const reviews = await this.prisma.review.findMany({
+      where,
+      include: {
+        program: {
+          select: {
+            id: true,
+            title: true
+          }
+        }
+      },
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' }
+    })
+
+    return {
+      success: true,
+      reviews,
+      totalPages: Math.ceil(total / limit),
+      total
+    }
+  }
 }
