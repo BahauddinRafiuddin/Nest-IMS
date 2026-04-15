@@ -21,16 +21,16 @@ import Loading from "../../components/common/Loading";
 import Pagination from "../../components/common/Pagination"; // Import pagination
 
 const priorityColors = {
-  low: "bg-emerald-50 text-emerald-700 border-emerald-100",
-  medium: "bg-amber-50 text-amber-700 border-amber-100",
-  high: "bg-rose-50 text-rose-700 border-rose-100",
+  LOW: "bg-emerald-50 text-emerald-700 border-emerald-100",
+  MEDIUM: "bg-amber-50 text-amber-700 border-amber-100",
+  HIGH: "bg-rose-50 text-rose-700 border-rose-100",
 };
 
 const statusColors = {
-  pending: "bg-slate-100 text-slate-600",
-  submitted: "bg-indigo-50 text-indigo-700 border-indigo-100",
-  approved: "bg-emerald-100 text-emerald-800",
-  rejected: "bg-rose-100 text-rose-800",
+  PENDING: "bg-slate-100 text-slate-600",
+  SUBMITTED: "bg-indigo-50 text-indigo-700 border-indigo-100",
+  APPROVED: "bg-emerald-100 text-emerald-800",
+  REJECTED: "bg-rose-100 text-rose-800",
 };
 
 const MentorTasks = () => {
@@ -43,18 +43,18 @@ const MentorTasks = () => {
 
   // PAGINATION STATE
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const [totalPages, setTotalPages] = useState(1);
   const limit = 1;
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const filterOptions = [
-    { label: "All Status", value: "all" },
-    { label: "Pending", value: "pending" },
-    { label: "Submitted", value: "submitted" },
-    { label: "Approved", value: "approved" },
-    { label: "Rejected", value: "rejected" },
+    { label: "All Status", value: "ALL" },
+    { label: "Pending", value: "PENDING" },
+    { label: "Submitted", value: "SUBMITTED" },
+    { label: "Approved", value: "APPROVED" },
+    { label: "Rejected", value: "REJECTED" },
   ];
 
   const handleTaskCreated = (newTask) => {
@@ -235,18 +235,18 @@ const MentorTasks = () => {
             <div className="space-y-6">
               {tasks.map((task) => (
                 <div
-                  key={task._id}
+                  key={task.id}
                   className="group relative bg-white rounded-4xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                 >
                   <div className="flex flex-col lg:flex-row">
                     {/* STATUS INDICATOR BAR */}
                     <div
                       className={`w-full lg:w-2 h-2 lg:h-auto ${
-                        task.status === "approved"
+                        task.status === "APPROVED"
                           ? "bg-emerald-500"
-                          : task.status === "rejected"
+                          : task.status === "REJECTED"
                             ? "bg-rose-500"
-                            : task.status === "submitted"
+                            : task.status === "SUBMITTED"
                               ? "bg-indigo-500"
                               : "bg-slate-200"
                       }`}
@@ -302,8 +302,8 @@ const MentorTasks = () => {
                             </p>
                           </div>
 
-                          {task.status === "submitted" &&
-                          task.reviewStatus !== "reviewed" ? (
+                          {task.status === "SUBMITTED" &&
+                          task.reviewStatus !== "REVIEWED" ? (
                             <button
                               onClick={() => setSelectedTask(task)}
                               className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-black text-white rounded-xl font-bold text-xs transition-all shadow-md active:scale-95 cursor-pointer"
@@ -313,7 +313,7 @@ const MentorTasks = () => {
                           ) : (
                             <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase">
                               <CheckCircle size={14} />{" "}
-                              {task.status === "approved"
+                              {task.status === "APPROVED"
                                 ? "Completed"
                                 : "Evaluated"}
                             </div>

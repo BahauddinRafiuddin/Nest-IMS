@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../common/guards/jwt.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -55,7 +55,7 @@ export class UserController {
     @Query('limit') limit = 5,
     @Query('search') search?: string
   ) {
-    return this.userService.getAllInterns(user.companyId,Number(page),Number(limit),search)
+    return this.userService.getAllInterns(user.companyId, Number(page), Number(limit), search)
   }
 
   @Get('/mentors')
@@ -66,7 +66,21 @@ export class UserController {
     @Query('limit') limit = 5,
     @Query('search') search?: string
   ) {
-    return this.userService.getAllMentors(user.companyId,Number(page),Number(limit),search)
+    return this.userService.getAllMentors(user.companyId, Number(page), Number(limit), search)
+  }
+
+  @Patch('intern/:id/status')
+  @Roles(Role.ADMIN)
+  updateInternStatus(
+    @Param('id') internId: string,
+    @Body('isActive') isActive: boolean,
+    @GetUser() user: any
+  ) {
+    return this.userService.updateInternStatus(
+      internId,
+      isActive,
+      user.companyId
+    );
   }
 
 }

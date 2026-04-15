@@ -1,27 +1,27 @@
 import api from "./axios"
 
 export const getMyTasks = async (page, limit, status) => {
-  const res = await api.get(`/intern/task?page=${page}&limit=${limit}&status=${status}`)
+  const res = await api.get(`/task/my?page=${page}&limit=${limit}&status=${status}`)
   return res.data
 }
 
 export const getMyPerformance = async (programId) => {
-  const res = await api.get(`/performance/intern/${programId}`)
+  const res = await api.get(`/performance/my/${programId}`)
   return res.data
 }
 
 export const getMyProgram = async () => {
-  const res = await api.get("/intern/my-programs")
+  const res = await api.get("/enrollment/my")
   return res.data
 }
 
 export const submitTask = async (taskId, data) => {
-  const res = await api.post(`/intern/task/${taskId}/submit`, data)
+  const res = await api.patch(`/task/${taskId}/submit`, data)
   return res.data
 }
 
-export const checkCertificateEligibility = async (programId) => {
-  const res = await api.get(`/certificate/eligibility/${programId}`)
+export const checkCertificateEligibility = async (enrollmentID) => {
+  const res = await api.get(`/certificate/eligibility/${enrollmentID}`)
   return res.data
 }
 
@@ -34,7 +34,7 @@ export const generateCertificate = async (programId) => {
 };
 
 export const startInternship = async (enrollmentId) => {
-  const res = await api.post("/intern/start", { enrollmentId });
+  const res = await api.patch(`/enrollment/${enrollmentId}/start`);
   return res.data;
 };
 
@@ -49,16 +49,16 @@ export const verifyPayment = async (paymentData) => {
 };
 
 export const getInternPaymentHistory = async () => {
-  const res = await api.get('/intern/payment-history')
+  const res = await api.get('/payment/my-payment-history')
   return res.data
 }
 
 export const createReview = async (reviewData) => {
-  const res = await api.post('/intern/review', reviewData)
+  const res = await api.post('/review', reviewData)
   return res.data
 }
 
 export const getMyReview = async () => {
-  const res = await api.get('/intern/review')
+  const res = await api.get('/review/my')
   return res.data
 }

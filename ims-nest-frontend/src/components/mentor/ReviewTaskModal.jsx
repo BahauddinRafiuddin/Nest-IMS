@@ -6,7 +6,7 @@ import { reviewTask } from "../../api/mentor.api";
 const ReviewTaskModal = ({ task, onClose, refresh }) => {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    status: "approved",
+    status: "APPROVED",
     score: "",
     feedback: "",
   });
@@ -23,7 +23,7 @@ const ReviewTaskModal = ({ task, onClose, refresh }) => {
 
     try {
       setLoading(true);
-      await reviewTask(task._id, {
+      await reviewTask(task.id, {
         status: form.status,
         score: Number(form.score),
         feedback: form.feedback,
@@ -46,7 +46,7 @@ const ReviewTaskModal = ({ task, onClose, refresh }) => {
         <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-slate-50/50">
           <div>
             <h2 className="text-2xl font-black text-slate-800 tracking-tight">Evaluate Submission</h2>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Reviewing Task ID: {task._id.slice(-6)}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Reviewing Task ID: {task.id.slice(-6)}</p>
           </div>
           <button
             type="button"
@@ -163,8 +163,8 @@ const ReviewTaskModal = ({ task, onClose, refresh }) => {
                     onChange={handleChange}
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500 transition-all appearance-none cursor-pointer"
                   >
-                    <option value="approved">✅ Approve Task</option>
-                    <option value="rejected">❌ Reject & Request Resubmission</option>
+                    <option value="APPROVED">✅ Approve Task</option>
+                    <option value="REJECTED">❌ Reject & Request Resubmission</option>
                   </select>
                 </div>
               </div>

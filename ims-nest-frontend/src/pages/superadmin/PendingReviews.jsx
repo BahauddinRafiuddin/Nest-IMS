@@ -34,7 +34,7 @@ const PendingReviews = () => {
       const res = await approveReview(id);
       toastSuccess(res.message || "Review approved");
 
-      setReviews((prev) => prev.filter((r) => r._id !== id));
+      setReviews((prev) => prev.filter((r) => r.id !== id));
     } catch (error) {
       toastError(error?.response?.data?.message || "Failed to approve review");
     }
@@ -45,7 +45,7 @@ const PendingReviews = () => {
       const res = await rejectReview(id);
       toastSuccess(res.message || "Review rejected");
 
-      setReviews((prev) => prev.filter((r) => r._id !== id));
+      setReviews((prev) => prev.filter((r) => r.id !== id));
     } catch (error) {
       toastError(error?.response?.data?.message || "Failed to reject review");
     }
@@ -96,7 +96,7 @@ const PendingReviews = () => {
               {/* TABLE BODY */}
               <tbody className="divide-y">
                 {reviews.map((review) => (
-                  <tr key={review._id} className="hover:bg-gray-50 transition">
+                  <tr key={review.id} className="hover:bg-gray-50 transition">
                     {/* INTERN */}
                     <td className="px-6 py-4 font-medium text-gray-800">
                       {review.intern?.name}
@@ -128,7 +128,7 @@ const PendingReviews = () => {
                     <td className="px-6 py-4">
                       <div className="flex justify-end gap-3">
                         <button
-                          onClick={() => handleApprove(review._id)}
+                          onClick={() => handleApprove(review.id)}
                           className="flex items-center gap-1 bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer"
                         >
                           <Check size={14} />
@@ -136,7 +136,7 @@ const PendingReviews = () => {
                         </button>
 
                         <button
-                          onClick={() => handleReject(review._id)}
+                          onClick={() => handleReject(review.id)}
                           className="flex items-center gap-1 bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer"
                         >
                           <X size={14} />

@@ -143,7 +143,7 @@ const CompanyReviews = () => {
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
             {reviews.map((review) => (
               <div
-                key={review._id}
+                key={review.id}
                 className="group relative bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
               >
                 {/* Decorative Quote Icon */}

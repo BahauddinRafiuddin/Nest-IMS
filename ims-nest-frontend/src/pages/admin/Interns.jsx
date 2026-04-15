@@ -76,7 +76,7 @@ const Interns = () => {
       setToggleStatus(null);
       fetchData();
     } catch (err) {
-      toastError(err.response?.data?.message);
+      toastError(err.message);
     }
   };
 
@@ -395,7 +395,7 @@ const Interns = () => {
           message={`Are you sure you want to ${toggleStatus.isActive ? "lock" : "unlock"} access for ${toggleStatus.name}?`}
           onCancel={() => setToggleStatus(null)}
           onConfirm={() =>
-            handleStatusToggle(toggleStatus._id, !toggleStatus.isActive)
+            handleStatusToggle(toggleStatus.id, !toggleStatus.isActive)
           }
         />
       )}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
+import { toastError } from "../../utils/toast";
 
 const SubmitTaskModal = ({ task, onClose, onSubmit }) => {
   const [form, setForm] = useState({
@@ -17,7 +18,7 @@ const SubmitTaskModal = ({ task, onClose, onSubmit }) => {
 
   const handleSubmit = () => {
     if (!form.submissionText && !form.submissionLink && !form.submissionFile) {
-      alert("Please provide at least one submission field");
+      toastError("Please provide at least one submission field");
       return;
     }
 

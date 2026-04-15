@@ -22,7 +22,6 @@ const AddCompanyModal = ({ onClose, onSuccess }) => {
     phone: "",
     address: "",
     commissionPercentage: 20,
-    adminEmail: "",
     adminName: "",
   });
 
@@ -56,8 +55,6 @@ const AddCompanyModal = ({ onClose, onSuccess }) => {
       newErrors.commissionPercentage = "Commission must be between 0 and 100";
     }
     if (!form.adminName.trim()) newErrors.adminName = "Admin name is required";
-    if (!emailRegex.test(form.adminEmail))
-      newErrors.adminEmail = "Invalid admin email address";
     if (
       form.commissionPercentage === "" ||
       form.commissionPercentage <= 0 ||
@@ -213,16 +210,6 @@ const AddCompanyModal = ({ onClose, onSuccess }) => {
                 onChange={handleChange}
                 error={errors.adminName}
                 placeholder="John Doe"
-              />
-              <InputField
-                label="Admin Work Email *"
-                name="adminEmail"
-                type="email"
-                icon={<Mail size={16} />}
-                value={form.adminEmail}
-                onChange={handleChange}
-                error={errors.adminEmail}
-                placeholder="admin@company.com"
               />
             </div>
           </div>

@@ -56,7 +56,7 @@ export class TaskService {
     };
   }
 
-  async getMyTasks(user: any, page: number, limit: number, status?: string) {
+  async getMyTasks(user: any, page=1, limit=5, status?: string) {
     const skip = (page - 1) * limit
 
     const where: any = {
@@ -181,7 +181,7 @@ export class TaskService {
     };
   }
 
-  async getMentorTasks(user: any, page: number, limit: number, status?: string) {
+  async getMentorTasks(user: any, page=1, limit=5, status?: string) {
     const skip = (page - 1) * limit
     const where: any = {
       mentorId: user.userId,
@@ -192,7 +192,7 @@ export class TaskService {
       }
     }
 
-    if (status && status !== 'all') {
+    if (status && status !== 'ALL') {
       where.status = status
     }
 

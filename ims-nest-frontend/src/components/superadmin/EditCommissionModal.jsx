@@ -25,7 +25,7 @@ const EditCommissionModal = ({ company, onClose, onSuccess }) => {
     try {
       setLoading(true);
       const res = await updateCompanyCommission(
-        company._id,
+        company.id,
         Number(commission),
       )
       toastSuccess(res.data?.message || "Commission updated successfully");

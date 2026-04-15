@@ -11,10 +11,13 @@ import { PerformanceModule } from './performance/performance.module';
 import { CertificateModule } from './certificate/certificate.module';
 import { PublicModule } from './public/public.module';
 import { JoinRequestModule } from './join-request/join-request.module';
+import { PaymentModule } from './payment/payment.module';
+import { ReviewModule } from './review/review.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 
 @Module({
-  imports: [PrismaModule, AuthModule, CompanyModule, UserModule, ProgramModule,EnrollmentModule,TaskModule,PerformanceModule,PublicModule,JoinRequestModule,
+  imports: [PrismaModule, AuthModule, CompanyModule, UserModule, ProgramModule, EnrollmentModule, TaskModule, PerformanceModule, PublicModule, JoinRequestModule, PaymentModule,ReviewModule,DashboardModule,
     ConfigModule.forRoot({
       isGlobal: true
     }),
@@ -27,6 +30,9 @@ import { JoinRequestModule } from './join-request/join-request.module';
     CertificateModule,
     PublicModule,
     JoinRequestModule,
+    PaymentModule,
+    ReviewModule,
+    DashboardModule,
   ],
 })
 export class AppModule { }

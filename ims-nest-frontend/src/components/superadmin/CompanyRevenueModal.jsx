@@ -9,7 +9,7 @@ const CompanyRevenueModal = ({ company, onClose }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getCompanyRevenueDetails(company._id);
+        const res = await getCompanyRevenueDetails(company.id);
         setData(res.data);
       } catch (err) {
         console.error(err);
@@ -54,7 +54,7 @@ const CompanyRevenueModal = ({ company, onClose }) => {
             <div className="bg-blue-50 rounded-2xl p-5 shadow-sm">
               <p className="text-sm text-gray-500">Total Revenue</p>
               <h3 className="text-2xl font-bold text-blue-600 mt-1">
-                ₹{data.totalRevenue}
+                ₹{data?.totalRevenue}
               </h3>
             </div>
 
@@ -64,7 +64,7 @@ const CompanyRevenueModal = ({ company, onClose }) => {
                 Super Admin Commission
               </p>
               <h3 className="text-2xl font-bold text-indigo-600 mt-1">
-                ₹{data.totalCommission}
+                ₹{data?.totalCommission}
               </h3>
             </div>
 
@@ -72,7 +72,7 @@ const CompanyRevenueModal = ({ company, onClose }) => {
             <div className="bg-green-50 rounded-2xl p-5 shadow-sm">
               <p className="text-sm text-gray-500">Company Earnings</p>
               <h3 className="text-2xl font-bold text-green-600 mt-1">
-                ₹{data.totalCompanyEarning}
+                ₹{data?.totalCompanyEarning}
               </h3>
             </div>
 
@@ -80,7 +80,7 @@ const CompanyRevenueModal = ({ company, onClose }) => {
             <div className="bg-emerald-50 rounded-2xl p-5 shadow-sm">
               <p className="text-sm text-gray-500">Available Balance</p>
               <h3 className="text-2xl font-bold text-emerald-600 mt-1">
-                ₹{data.availableBalance}
+                ₹{data?.availableBalance}
               </h3>
             </div>
 
@@ -90,7 +90,7 @@ const CompanyRevenueModal = ({ company, onClose }) => {
                 Total Transactions
               </p>
               <h3 className="text-xl font-semibold text-gray-800 mt-1">
-                {data.totalTransactions}
+                {data?.totalTransactions}
               </h3>
             </div>
 

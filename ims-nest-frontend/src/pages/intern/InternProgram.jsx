@@ -7,9 +7,9 @@ import { initiatePayment } from "../../services/razorpay.service";
 import Loading from '../../components/common/Loading';
 
 const statusStyles = {
-  upcoming: "bg-amber-50 text-amber-600 border-amber-100",
-  active: "bg-emerald-50 text-emerald-600 border-emerald-100",
-  completed: "bg-slate-100 text-slate-500 border-slate-200",
+  UPCOMING: "bg-amber-50 text-amber-600 border-amber-100",
+  ACTIVE: "bg-emerald-50 text-emerald-600 border-emerald-100",
+  COMPLETED: "bg-slate-100 text-slate-500 border-slate-200",
 };
 
 const InternPrograms = () => {
@@ -19,7 +19,7 @@ const InternPrograms = () => {
   const fetchPrograms = async () => {
     try {
       const res = await getMyProgram();
-      setPrograms(res.enrollement || []);
+      setPrograms(res.enrollment || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -30,18 +30,17 @@ const InternPrograms = () => {
   useEffect(() => {
     fetchPrograms();
   }, []);
-
   const handleStart = async (enrollmentId) => {
     try {
       const res = await startInternship(enrollmentId);
       toastSuccess(res.message);
       setPrograms((prev) =>
         prev.map((p) =>
-          p._id === enrollmentId ? { ...p, status: "in_progress" } : p,
+          p.id === enrollmentId ? { ...p, status: "IN_PROGRESS" } : p,
         ),
       );
     } catch (err) {
-      toastError(err.response?.data?.message);
+      toastError(err.response);
     }
   };
 
@@ -69,7 +68,7 @@ const InternPrograms = () => {
           const program = enrollment.program;
 
           return (
-            <div key={enrollment._id} className="group bg-white rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col">
+            <div key={enrollment.id} className="group bg-white rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col">
               
               {/* TOP STRIP: PROGRAM LOGO & STATUS */}
               <div className="p-8 pb-4 flex justify-between items-start gap-4">
@@ -120,19 +119,19 @@ const InternPrograms = () => {
               <div className="p-8 mt-auto flex flex-col gap-4">
                 <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-300 px-1">
                     <span>Enrollment: {enrollment.status.replace("_", " ")}</span>
-                    {program.type === 'paid' && (
-                        <span className={enrollment.paymentStatus === 'paid' ? 'text-emerald-500' : 'text-amber-500'}>
+                    {program.type === 'PAID' && (
+                        <span className={enrollment.paymentStatus === 'PAID' ? 'text-emerald-500' : 'text-amber-500'}>
                             Payment: {enrollment.paymentStatus || 'Pending'}
                         </span>
                     )}
                 </div>
 
                 {/* LOGIC-BASED BUTTONS */}
-                {enrollment.status === "approved" && program.type === "free" && (
-                    <ActionButton onClick={() => handleStart(enrollment._id)} icon={PlayCircle} label="Start Internship" color="green" />
+                {enrollment.status === "APPROVED" && program.type === "FREE" && (
+                    <ActionButton onClick={() => handleStart(enrollment.id)} icon={PlayCircle} label="Start Internship" color="green" />
                 )}
 
-                {enrollment.status === "approved" && program.type === "paid" && enrollment.paymentStatus !== "paid" && (
+                {enrollment.status === "APPROVED" && program.type === "PAID" && enrollment.paymentStatus !== "PAID" && (
                     <ActionButton 
                         onClick={() => initiatePayment({
                             enrollment,
@@ -145,17 +144,17 @@ const InternPrograms = () => {
                     />
                 )}
 
-                {enrollment.status === "approved" && program.type === "paid" && enrollment.paymentStatus === "paid" && (
-                    <ActionButton onClick={() => handleStart(enrollment._id)} icon={PlayCircle} label="Start Internship" color="green" />
+                {enrollment.status === "APPROVED" && program.type === "PAID" && enrollment.paymentStatus === "PAID" && (
+                    <ActionButton onClick={() => handleStart(enrollment.id)} icon={PlayCircle} label="Start Internship" color="green" />
                 )}
 
-                {enrollment.status === "in_progress" && (
+                {enrollment.status === "IN_PROGRESS" && (
                     <div className="w-full bg-emerald-50 text-emerald-600 py-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest border border-emerald-100">
                         <CheckCircle2 size={18}/> In Progress
                     </div>
                 )}
 
-                {enrollment.status === "completed" && (
+                {enrollment.status === "COMPLETED" && (
                     <div className="w-full bg-slate-100 text-slate-400 py-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest">
                         <CheckCircle2 size={18}/> Program Completed
                     </div>

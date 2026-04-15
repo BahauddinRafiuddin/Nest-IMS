@@ -45,7 +45,7 @@ export class ProgramService {
         endDate: end,
         durationInWeeks,
         companyId: user.companyId,
-        status:"UPCOMING"
+        status: "UPCOMING"
       }
     })
 
@@ -118,7 +118,7 @@ export class ProgramService {
       endDate: p.endDate,
       price: p.price,
       type: p.type,
-      minimumTasksRequired:p.minimumTasksRequired
+      minimumTasksRequired: p.minimumTasksRequired
     }));
 
     return {
@@ -297,4 +297,6 @@ export class ProgramService {
       `Invalid transition from ${currentStatus} to ${changedStatus}`
     );
   }
+
+ 
 }

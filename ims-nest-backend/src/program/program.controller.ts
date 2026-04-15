@@ -7,6 +7,7 @@ import { CreateProgramDto } from './dto/create-program.dto';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { UpdateProgramDto } from './dto/update-program.dto';
 import { ChangeProgramStatusDto } from './dto/change-status.dto';
+import { Role } from '@prisma/client';
 
 @Controller('program')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -55,6 +56,5 @@ export class ProgramController {
       dto
     );
   }
-
   
 }

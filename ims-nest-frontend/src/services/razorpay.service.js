@@ -31,8 +31,8 @@ export const initiatePayment = async ({
   }
 
   try {
-    const orderRes = await createPaymentOrder(enrollment._id);
-    const { order } = orderRes;
+    const orderRes = await createPaymentOrder(enrollment.id);
+    const order = orderRes.data;
 
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -42,13 +42,21 @@ export const initiatePayment = async ({
       description: enrollment.program.title,
       order_id: order.id,
 
+      method: {
+        upi: true,
+      },
+
+      upi: {
+        flow: "collect", // 🔥 IMPORTANT
+      },
+
       handler: async function (response) {
         try {
           await verifyPayment({
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
-            enrollmentId: enrollment._id,
+            enrollmentId: enrollment.id,
           });
 
           onSuccess();
@@ -59,11 +67,6 @@ export const initiatePayment = async ({
 
       theme: {
         color: "#4f46e5",
-      },
-      modal: {
-        ondismiss: function () {
-          onFailure("Payment cancelled");
-        },
       },
     };
 

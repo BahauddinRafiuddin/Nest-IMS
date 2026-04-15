@@ -45,13 +45,13 @@ const MentorPrograms = () => {
 
   const handleComplete = async () => {
     try {
-      const res = await completeInternship(selectedEnrollment._id);
+      const res = await completeInternship(selectedEnrollment.id);
       setPrograms((prev) =>
         prev.map((program) => ({
           ...program,
           interns: program.interns.map((enrollment) =>
-            enrollment._id === selectedEnrollment._id
-              ? { ...enrollment, status: "completed" }
+            enrollment.id === selectedEnrollment.id
+              ? { ...enrollment, status: "COMPLETED" }
               : enrollment,
           ),
         })),
@@ -60,7 +60,7 @@ const MentorPrograms = () => {
       setSelectedEnrollment(null);
     } catch (error) {
       console.log(error);
-      toastError(error.response?.data?.message || "Something went wrong");
+      toastError(error.message || "Something went wrong");
     }
   };
   if (loading) return <Loading />;
@@ -101,7 +101,7 @@ const MentorPrograms = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {programs.map((program) => (
           <div
-            key={program._id}
+            key={program.id}
             className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
           >
             {/* TOP SECTION: IDENTIFIER */}
@@ -186,7 +186,7 @@ const MentorPrograms = () => {
                 <div className="space-y-4 max-h-100 overflow-y-auto pr-2 custom-scrollbar">
                   {program.interns.map((enrollment) => (
                     <div
-                      key={enrollment._id}
+                      key={enrollment.id}
                       className="group/item relative bg-white border border-slate-100 rounded-3xl p-5 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-50/50 transition-all"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -208,7 +208,7 @@ const MentorPrograms = () => {
                         </div>
 
                         <div
-                          className={`self-start sm:self-center px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter ${enrollment.status === "completed" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}
+                          className={`self-start sm:self-center px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-tighter ${enrollment.status === "COMPLETED" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"}`}
                         >
                           {enrollment.status.replace("_", " ")}
                         </div>
@@ -216,7 +216,7 @@ const MentorPrograms = () => {
 
                       {/* ACTIONS */}
                       <div className="mt-5 pt-5 border-t border-slate-50">
-                        {enrollment.status === "in_progress" ? (
+                        {enrollment.status === "IN_PROGRESS" ? (
                           <button
                             onClick={() => setSelectedEnrollment(enrollment)}
                             className="w-full bg-indigo-600 hover:bg-black text-white text-xs font-black uppercase tracking-widest py-3 rounded-xl transition-all shadow-lg shadow-indigo-100 active:scale-95 cursor-pointer flex items-center justify-center gap-2"

@@ -156,9 +156,9 @@ const SuperAdminFinance = () => {
 
           <div className="space-y-4">
             {breakdown.map((b) => (
-              <div key={b._id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:border-indigo-200 transition-colors">
+              <div key={b.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:border-indigo-200 transition-colors">
                 <div>
-                    <div className="text-lg font-black text-slate-800">{b._id}% <span className="text-xs font-medium text-slate-400 italic">Tier</span></div>
+                    <div className="text-lg font-black text-slate-800">{b.commissionPercentage}% <span className="text-xs font-medium text-slate-400 italic">Tier</span></div>
                     <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{b.totalTransactions} Transactions</div>
                 </div>
                 <div className="text-right">
@@ -185,7 +185,7 @@ const SuperAdminFinance = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                         {transactions.map((t) => (
-                            <tr key={t._id} className="hover:bg-slate-50 transition-colors group">
+                            <tr key={t.id} className="hover:bg-slate-50 transition-colors group">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-500 shadow-inner">

@@ -15,7 +15,7 @@ const CompanyCommissionHistoryModal = ({ company, onClose }) => {
       setLoading(true);
       try {
         const res = await getSingleCompanyComissionHistory(
-          company._id,
+          company.id,
           page,
           limit,
         );
@@ -53,14 +53,14 @@ const CompanyCommissionHistoryModal = ({ company, onClose }) => {
         {/* EXPORT BUTTONS */}
         <div className="flex gap-2 justify-end mb-4">
           <button
-            onClick={() => exportCompanyCommissionHistory(company._id, "excel")}
+            onClick={() => exportCompanyCommissionHistory(company.id, "excel")}
             className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition"
           >
             Export Excel
           </button>
 
           <button
-            onClick={() => exportCompanyCommissionHistory(company._id, "pdf")}
+            onClick={() => exportCompanyCommissionHistory(company.id, "pdf")}
             className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition"
           >
             Export PDF

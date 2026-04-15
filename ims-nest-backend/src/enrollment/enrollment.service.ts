@@ -58,43 +58,98 @@ export class EnrollmentService {
     };
   }
 
-  async myEnrollments(user: any) {
+  async getInternEnrollments(user: any) {
     const enrollments = await this.prisma.enrollment.findMany({
       where: {
-        internId: user.userId,
-        program: {
-          isActive: true
-        }
+        internId: user.userId
       },
       include: {
         program: {
           select: {
-            id: true,
+            id:true,
             title: true,
             domain: true,
-            durationInWeeks: true,
-            status: true,
+            description: true,
             type: true,
+            price: true,
+            durationInWeeks: true,
             startDate: true,
-            endDate: true
-          },
+            endDate: true,
+          }
         },
         mentor: {
           select: {
-            id: true,
             name: true,
-            email: true
-          },
+            email: true,
+          }
         }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      },
-    });
+      }
+    })
+
+    const validEnrollments = enrollments.filter(
+      (e) => e.program !== null
+    )
 
     return {
-      enrollments
+      success: true,
+      enrollment: validEnrollments
     };
+  }
+
+  async getMentorEnrollments(user: any, page=1, limit=1) {
+    const skip = (page - 1) * limit
+    const programs = await this.prisma.internshipProgram.findMany({
+      where: {
+        mentorId: user.userId,
+        companyId: user.companyId
+      },
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
+
+    const total = await this.prisma.internshipProgram.count({
+      where: {
+        mentorId: user.userId,
+        companyId: user.companyId
+      }
+    })
+
+    const programsWithInterns = await Promise.all(
+      programs.map(async (program) => {
+        const enrollments = await this.prisma.enrollment.findMany({
+          where: {
+            programId: program.id,
+            mentorId: user.userId,
+            status: "IN_PROGRESS"
+          },
+          include: {
+            intern: {
+              select: {
+                id:true,
+                name: true,
+                email: true
+              }
+            }
+          }
+        })
+
+        return {
+          ...program,
+          interns: enrollments
+        }
+      })
+    )
+
+    return {
+      success: true,
+      message: "Mentor Programs Found Successfully",
+      programs: programsWithInterns,
+      totalPages: Math.ceil(total / limit),
+      total
+    }
   }
 
   async startInternship(enrollmentId: string, user: any) {
@@ -194,5 +249,58 @@ export class EnrollmentService {
     return {
       message: 'Internship marked as completed',
     };
+  }
+
+  async getMentorInterns(mentorId: any, page=1, limit=1) {
+    const skip = (page - 1) * limit
+    const enrollments = await this.prisma.enrollment.findMany({
+      where: {
+        mentorId,
+        status: {
+          in: ["APPROVED", "IN_PROGRESS"]
+        }
+      },
+      include: {
+        intern: {
+          select: {
+            id:true,
+            name: true,
+            email: true
+          }
+        },
+        program: {
+          select: {
+            id:true,
+            title: true,
+            domain: true,
+            durationInWeeks: true,
+            startDate: true,
+            endDate: true,
+            status: true,
+          }
+        }
+      },
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: "desc"
+      }
+    })
+
+    const total = await this.prisma.enrollment.count({
+      where: {
+        mentorId,
+        status: {
+          in: ["APPROVED", "IN_PROGRESS"]
+        }
+      }
+    })
+
+    return {
+      success: true,
+      interns: enrollments,
+      total,
+      totalPages: Math.ceil(total / limit),
+    }
   }
 }

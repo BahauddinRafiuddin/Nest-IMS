@@ -22,13 +22,13 @@ const InternDashboard = () => {
     const fetchDashboard = async () => {
       try {
         const myProgram = await getMyProgram();
-        const enrollments = myProgram.enrollement || [];
+        const enrollments = myProgram.enrollment || [];
         const validEnrollments = enrollments.filter((e) => e.program !== null);
         setPrograms(validEnrollments);
 
         if (validEnrollments.length > 0) {
-          const programId = validEnrollments[0].program._id;
-          const myPerformance = await getMyPerformance(programId);
+          const enrollmentId = validEnrollments[0].id;
+          const myPerformance = await getMyPerformance(enrollmentId);
 
           setStats({
             programs: validEnrollments.length,
@@ -86,7 +86,7 @@ const InternDashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {programs.map((enrollment) => (
-            <div key={enrollment._id} className="group bg-white rounded-4xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+            <div key={enrollment.id} className="group bg-white rounded-4xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
               <div className="p-8">
                 <div className="flex justify-between items-start mb-6">
                     <div className="bg-slate-50 p-3 rounded-2xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">

@@ -14,12 +14,12 @@ const CreateTaskModal = ({ programs, onClose, onCreated }) => {
     title: "",
     description: "",
     programId: "",
-    internId: "",
-    priority: "medium",
+    assignedInternId: "",
+    priority: "MEDIUM",
     deadline: "",
   });
 
-  const selectedProgram = programs.find((p) => p._id === form.programId);
+  const selectedProgram = programs.find((p) => p.id === form.programId);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,7 +36,7 @@ const CreateTaskModal = ({ programs, onClose, onCreated }) => {
   };
 
   const handleSubmit = async () => {
-    if (!form.title || !form.programId || !form.internId || !form.deadline) {
+    if (!form.title || !form.programId || !form.assignedInternId || !form.deadline) {
       return toastError("Please fill all required fields");
     }
 
@@ -114,7 +114,7 @@ const CreateTaskModal = ({ programs, onClose, onCreated }) => {
               >
                 <option value="">Select program</option>
                 {programs.map((p) => (
-                  <option key={p._id} value={p._id}>{p.title}</option>
+                  <option key={p.id} value={p.id}>{p.title}</option>
                 ))}
               </select>
             </div>
@@ -122,8 +122,8 @@ const CreateTaskModal = ({ programs, onClose, onCreated }) => {
             <div className="space-y-5">
               <FormLabel icon={User} label="Assign Intern" required />
               <select
-                name="internId"
-                value={form.internId}
+                name="assignedInternId"
+                value={form.assignedInternId}
                 onChange={handleChange}
                 disabled={!selectedProgram}
                 className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3 text-slate-700 font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
@@ -131,7 +131,7 @@ const CreateTaskModal = ({ programs, onClose, onCreated }) => {
                 <option value="">Select intern</option>
                 {selectedProgram?.interns?.length > 0 ? (
                   selectedProgram.interns.map((i) => (
-                    <option key={i.intern._id} value={i.intern._id}>{i.intern.name}</option>
+                    <option key={i.intern.id} value={i.intern.id}>{i.intern.name}</option>
                   ))
                 ) : (
                   <option disabled>No interns enrolled</option>
@@ -147,9 +147,9 @@ const CreateTaskModal = ({ programs, onClose, onCreated }) => {
                 onChange={handleChange}
                 className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-3 text-slate-700 font-bold focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer appearance-none"
               >
-                <option value="low">Low Priority</option>
-                <option value="medium">Medium Priority</option>
-                <option value="high">High Priority</option>
+                <option value="LOW">Low Priority</option>
+                <option value="MEDIUM">Medium Priority</option>
+                <option value="HIGH">High Priority</option>
               </select>
             </div>
 

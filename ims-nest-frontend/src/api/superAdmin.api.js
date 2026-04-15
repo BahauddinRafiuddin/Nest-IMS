@@ -2,22 +2,22 @@ import api from "./axios"
 
 
 export const createCompany = async (data) => {
-  const res = await api.post(`/companies`, data)
+  const res = await api.post(`/company`, data)
   return res.data
 }
 
 export const getAllcompanies = async () => {
-  const res = await api.get('/companies')
+  const res = await api.get('/company')
   return res.data
 }
 
 export const toggleCompanyStatus = async (id) => {
-  const res = await api.patch(`/companies/${id}`)
+  const res = await api.patch(`/company/${id}/toggle-status`)
   return res.data
 }
 
 export const getSuperAdminDashboard = async () => {
-  const res = await api.get("/superadmin/dashboard");
+  const res = await api.get("dashboard/super-admin");
   return res.data;
 }
 
@@ -27,18 +27,18 @@ export const getCompanyFinanceOverview = async () => {
 }
 
 export const getCompanyRevenueDetails = async (companyId) => {
-  const res = await api.get(`/superadmin/company-finance/${companyId}`);
+  const res = await api.get(`/company/${companyId}/finance`);
   return res.data;
 }
 
 export const getPlatformFinanceStats = async () => {
-  const res = await api.get('/superadmin/platform-finance')
+  const res = await api.get('/dashboard/platform-finance')
   return res.data
 }
 
 export const updateCompanyCommission = async (companyId, commissionPercentage) => {
-  const res = await api.put(
-    `/superadmin/update-comission/${companyId}`,
+  const res = await api.patch(
+    `/company/${companyId}/commission`,
     { commissionPercentage }
   )
   return res.data
@@ -50,7 +50,7 @@ export const getAllTransactionReport = async (
   const query = new URLSearchParams(filters).toString()
 
   const res = await api.get(
-    `/superadmin/transactions?${query}`
+    `/dashboard/company-transaction-report?${query}`
   )
 
   return res.data
@@ -89,23 +89,23 @@ export const exportCompanyCommissionHistory = async (companyId, format) => {
 
 export const getSingleCompanyComissionHistory = async (companyId, page, limit) => {
   const res = await api.get(
-    `/superadmin/comission-history/${companyId}?page=${page}&limit=${limit}`
+    `/company/${companyId}/commission-history?page=${page}&limit=${limit}`
   )
 
   return res.data
 }
 
 export const getPendingReviews = async () => {
-  const res = await api.get('/superadmin/pending-reviews')
+  const res = await api.get('/review/pending')
   return res.data
 }
 
 export const approveReview = async (reviewId) => {
-  const res = await api.put(`/superadmin/approveReview/${reviewId}`)
+  const res = await api.patch(`/review/${reviewId}/approve`)
   return res.data
 }
 
 export const rejectReview = async (reviewId) => {
-  const res = await api.put(`/superadmin/rejectReview/${reviewId}`)
+  const res = await api.patch(`/review/${reviewId}/reject`)
   return res.data
 }

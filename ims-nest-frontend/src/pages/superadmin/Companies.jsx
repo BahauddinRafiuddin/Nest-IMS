@@ -98,7 +98,7 @@ const SuperAdminCompanies = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {companies.map((company) => (
-                  <tr key={company._id} className="hover:bg-slate-50/80 transition-colors group">
+                  <tr key={company.id} className="hover:bg-slate-50/80 transition-colors group">
                     {/* Identity */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
@@ -186,7 +186,7 @@ const SuperAdminCompanies = () => {
           title={toggleStatus.isActive ? "Suspend Partner Access" : "Restore Partner Access"}
           message={`Are you sure you want to ${toggleStatus.isActive ? "deactivate" : "activate"} ${toggleStatus.name}? This will affect their ability to manage programs.`}
           onCancel={() => setToggleStatus(null)}
-          onConfirm={() => handleToggle(toggleStatus._id)}
+          onConfirm={() => handleToggle(toggleStatus.id)}
         />
       )}
       {selectedCompany && <CompanyRevenueModal company={selectedCompany} onClose={() => setSelectedCompany(null)} />}

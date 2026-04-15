@@ -13,7 +13,7 @@ export const reviewJoinRequest = async (id, action) => {
 };
 
 export const getDashboardData = async () => {
-  const res = await api.get("/admin/dashboard");
+  const res = await api.get("/dashboard/admin");
   return res.data;
 }
 
@@ -50,7 +50,7 @@ export const getAvailableMentors=async () => {
 }
 
 export const getCompanyReviews = async (page, limit, minRating) => {
-  const res = await api.get(`/company/reviews?page=${page}&limit=${limit}&minRating=${minRating}`)
+  const res = await api.get(`/review/company?page=${page}&limit=${limit}&minRating=${minRating}`)
   return res.data
 }
 
@@ -88,7 +88,7 @@ export const exportMentorApi = async (search, format) => {
 }
 
 export const updateInternStatus = async (internId, isActive) => {
-  const res = await api.put(`/admin/intern/${internId}/status`, { isActive })
+  const res = await api.patch(`/user/intern/${internId}/status`, { isActive })
   return res.data;
 }
 
@@ -114,7 +114,7 @@ export const deleteMentorById = async (mentorId) => {
 
 export const getAdminFinanceOverview = async (filters = {}) => {
   const query = new URLSearchParams(filters).toString()
-  const res = await api.get(`/admin/finance-overview?${query}`);
+  const res = await api.get(`/dashboard/admin-finance?${query}`);
   return res.data;
 }
 

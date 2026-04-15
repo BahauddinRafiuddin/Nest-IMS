@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { generateTempPassword } from '../common/utils/createTemp-pass';
@@ -320,4 +320,38 @@ export class UserService {
       currentPage: page,
     };
   }
+
+  async updateInternStatus(
+  internId: string,
+  isActive: boolean,
+  companyId: string
+) {
+
+  // find intern
+  const intern = await this.prisma.user.findUnique({
+    where: { id: internId },
+  });
+
+  if (!intern || intern.role !== 'INTERN') {
+    throw new NotFoundException('Intern Not Found');
+  }
+
+  // check company ownership
+  if (intern.companyId !== companyId) {
+    throw new ForbiddenException('Unauthorized');
+  }
+
+  // update status
+  await this.prisma.user.update({
+    where: { id: internId },
+    data: {
+      isActive,
+    },
+  });
+
+  return {
+    success: true,
+    message: `${intern.name} ${isActive ? 'Activated' : 'Deactivated'}`,
+  };
+}
 }

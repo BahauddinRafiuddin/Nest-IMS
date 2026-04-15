@@ -36,13 +36,12 @@ const Performance = () => {
     const load = async () => {
       try {
         const programRes = await getMyProgram();
-        const programId = programRes.enrollement[0].program._id;
-        // console.log(programRes)
-        setPStatus(programRes.enrollement[0].status);
-        const perfRes = await getMyPerformance(programId);
+        const enrollmentId = programRes.enrollment[0]?.id;
+        setPStatus(programRes.enrollment[0].status);
+        const perfRes = await getMyPerformance(enrollmentId);
         setPerformance(perfRes.performance);
       } catch (err) {
-        console.error(err);
+        console.log(err);
       } finally {
         setLoading(false);
       }
@@ -187,7 +186,7 @@ const Performance = () => {
           </div>
         </div>
         {/* GRADE */}
-        {pStatus === "completed" && (
+        {pStatus === "COMPLETED" && (
           <div className="bg-white rounded-2xl shadow p-6 flex flex-col justify-center items-center space-y-3">
             <Star className="text-yellow-400" size={40} />
 

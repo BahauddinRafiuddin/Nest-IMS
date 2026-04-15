@@ -20,17 +20,17 @@ import Loading from "../../components/common/Loading";
 import Pagination from "../../components/common/Pagination";
 
 const priorityColors = {
-  low: "bg-emerald-50 text-emerald-700 border-emerald-100",
-  medium: "bg-amber-50 text-amber-700 border-amber-100",
-  high: "bg-rose-50 text-rose-700 border-rose-100",
+  LOW: "bg-emerald-50 text-emerald-700 border-emerald-100",
+  MEDIUM: "bg-amber-50 text-amber-700 border-amber-100",
+  HIGH: "bg-rose-50 text-rose-700 border-rose-100",
 };
 
 const statusColors = {
-  pending: "bg-slate-100 text-slate-600",
-  in_progress: "bg-blue-50 text-blue-600 border-blue-100",
-  submitted: "bg-indigo-50 text-indigo-700 border-indigo-100",
-  approved: "bg-emerald-100 text-emerald-800",
-  rejected: "bg-rose-100 text-rose-800 font-bold",
+  PENDING: "bg-slate-100 text-slate-600",
+  IN_PROGRESS: "bg-blue-50 text-blue-600 border-blue-100",
+  SUBMITTED: "bg-indigo-50 text-indigo-700 border-indigo-100",
+  APPROVED: "bg-emerald-100 text-emerald-800",
+  REJECTED: "bg-rose-100 text-rose-800 font-bold",
 };
 
 const InternTasks = () => {
@@ -44,10 +44,10 @@ const InternTasks = () => {
   // Define the available filter options
   const filterOptions = [
     { label: "All Tasks", value: "", color: "bg-slate-400" },
-    { label: "Pending", value: "pending", color: "bg-slate-500" },
-    { label: "Submitted", value: "submitted", color: "bg-indigo-500" },
-    { label: "Approved", value: "approved", color: "bg-emerald-500" },
-    { label: "Rejected", value: "rejected", color: "bg-rose-500" },
+    { label: "Pending", value: "PENDING", color: "bg-slate-500" },
+    { label: "Submitted", value: "SUBMITTED", color: "bg-indigo-500" },
+    { label: "Approved", value: "APPROVED", color: "bg-emerald-500" },
+    { label: "Rejected", value: "REJECTED", color: "bg-rose-500" },
   ];
 
   // PAGINATION STATE
@@ -74,7 +74,7 @@ const InternTasks = () => {
 
   const handleSubmitTask = async (data) => {
     try {
-      await submitTask(selectedTask._id, data);
+      await submitTask(selectedTask.id, data);
       toastSuccess("Task submitted successfully");
       setSelectedTask(null);
       fetchMyTasks();
@@ -154,18 +154,18 @@ const InternTasks = () => {
         <div className="space-y-6">
           {tasks.map((task) => (
             <div
-              key={task._id}
+              key={task.id}
               className="group bg-white rounded-4xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
             >
               <div className="flex flex-col lg:flex-row lg:items-stretch">
                 {/* STATUS INDICATOR BAR */}
                 <div
                   className={`w-full lg:w-2 h-2 lg:h-auto ${
-                    task.status === "approved"
+                    task.status === "APPROVED"
                       ? "bg-emerald-500"
-                      : task.status === "rejected"
+                      : task.status === "REJECTED"
                         ? "bg-rose-500"
-                        : task.status === "submitted"
+                        : task.status === "SUBMITTED"
                           ? "bg-indigo-500"
                           : "bg-slate-200"
                   }`}
@@ -255,14 +255,14 @@ const InternTasks = () => {
 
                     {/* RIGHT: ACTION BUTTON */}
                     <div className="flex items-center lg:items-start justify-end min-w-35">
-                      {task.status === "pending" ||
-                      task.status === "rejected" ||
-                      task.status === "in_progress" ? (
+                      {task.status === "PENDING" ||
+                      task.status === "REJECTED" ||
+                      task.status === "IN_PROGRESS" ? (
                         <button
                           onClick={() => setSelectedTask(task)}
                           className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-indigo-600 hover:bg-black text-white rounded-xl font-black uppercase tracking-widest text-[10px] transition-all shadow-lg shadow-indigo-100 active:scale-95 cursor-pointer"
                         >
-                          {task.status === "rejected"
+                          {task.status === "REJECTED"
                             ? "Resubmit Work"
                             : "Submit Task"}
                           <ArrowUpRight size={14} />

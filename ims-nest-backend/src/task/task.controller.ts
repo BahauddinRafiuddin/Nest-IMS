@@ -14,39 +14,48 @@ import { ReviewTaskDto } from './dto/review-task.dto';
 export class TaskController {
   constructor(private taskService: TaskService) { }
 
+  // Mentor can create tasks
   @Post()
   @Roles("MENTOR")
   createTask(@Body() body: CreateTaskDto, @GetUser() user: any) {
     return this.taskService.createTask(body, user)
   }
 
+  // Interns tasks
   @Get('my')
   @Roles("INTERN")
   getMyTasks(
     @GetUser() user: any,
-    @Query('page') page = 1,
-    @Query('limit') limit = 5,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
     @Query('status') status?: string,
   ) {
-    return this.taskService.getMyTasks(user, Number(page), Number(limit), status)
+    const pageNumber = Number(page) || 1;
+    const limitNumber = Number(limit) || 5;
+    return this.taskService.getMyTasks(user, pageNumber, limitNumber, status)
   }
 
+  // Intern can submit taks
   @Patch(':id/submit')
   @Roles("INTERN")
   submitTask(@Body() body: SubmitTaskDto, @GetUser() user: any, @Param('id') taskId: string) {
     return this.taskService.submitTask(body, user, taskId)
   }
 
+  // Mentor can see his cretaed tasks
   @Get('/mentorTasks')
   @Roles("MENTOR")
   getMenotrTasks(@GetUser() user: any,
-    @Query('page') page = 1,
-    @Query('limit') limit = 5,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
     @Query('status') status?: string
   ) {
-    return this.taskService.getMentorTasks(user, Number(page), Number(limit), status)
+    const pageNumber = Number(page) || 1;
+    const limitNumber = Number(limit) || 5;
+    return this.taskService.getMentorTasks(user, pageNumber, limitNumber, status)
   }
 
+  // Mentor review taks
   @Patch('/:id/review')
   @Roles("MENTOR")
   reviewTask(@Body() body: ReviewTaskDto, @GetUser() user: any, @Param('id') id: string) {

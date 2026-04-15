@@ -75,7 +75,7 @@ const MentorInterns = () => {
       <div className="space-y-12">
         {enrollments.map((item) => (
           <div
-            key={item._id}
+            key={item.id}
             className="group animate-in fade-in slide-in-from-bottom-4 duration-500"
           >
             {/* PROGRAM STRIP */}

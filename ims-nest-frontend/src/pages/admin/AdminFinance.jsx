@@ -255,12 +255,12 @@ const AdminFinance = () => {
                   <tbody className="divide-y divide-slate-100">
                     {commissionBreakdown.map((b) => (
                       <tr
-                        key={b._id}
+                        key={b.id}
                         className="hover:bg-slate-50 transition-colors"
                       >
                         <td className="px-6 py-4">
                           <span className="bg-indigo-50 text-indigo-700 px-2 py-1 rounded text-xs font-bold">
-                            {b._id}%
+                            {b.commissionPercentage}%
                           </span>
                         </td>
                         <td className="px-6 py-4 font-medium text-slate-700">
@@ -322,7 +322,7 @@ const AdminFinance = () => {
             <tbody className="divide-y divide-slate-100">
               {transactions?.map((txn) => (
                 <tr
-                  key={txn._id}
+                  key={txn.id}
                   className="hover:bg-slate-50/80 transition-colors group"
                 >
                   <td className="px-6 py-4">

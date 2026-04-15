@@ -151,7 +151,7 @@ const SuperAdminDashboard = () => {
                 </thead>
                 <tbody className="divide-y divide-slate-50">
                   {recentCompanies.map((company) => (
-                    <tr key={company._id} className="group hover:bg-slate-50/80 transition-colors">
+                    <tr key={company.id} className="group hover:bg-slate-50/80 transition-colors">
                       <td className="px-8 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm shadow-sm">

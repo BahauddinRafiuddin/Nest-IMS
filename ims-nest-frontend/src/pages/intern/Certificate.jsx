@@ -12,18 +12,18 @@ const Certificate = () => {
   const [loading, setLoading] = useState(true);
   const [eligible, setEligible] = useState(false);
   const [details, setDetails] = useState(null);
-  const [programId, setProgramId] = useState("");
+  const [enrollmentId, setEnrollmentId] = useState("");
 
   useEffect(() => {
     const loadEligibility = async () => {
       try {
         const programRes = await getMyProgram();
         // console.log("res",programRes)
-        const id = programRes.enrollement[0].program._id;
-        setProgramId(id);
+        const id = programRes.enrollment[0].id;
+        setEnrollmentId(id);
 
         const res = await checkCertificateEligibility(id);
-        // console.log("eligible",res)
+        console.log("eligible",res)
         setEligible(res.eligible);
         setDetails(res);
       } catch (err) {
@@ -38,7 +38,7 @@ const Certificate = () => {
 
   const handleDownload = async () => {
     try {
-      const response = await generateCertificate(programId);
+      const response = await generateCertificate(enrollmentId);
 
       const blob = new Blob([response], {
         type: "application/pdf",
