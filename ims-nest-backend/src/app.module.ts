@@ -14,10 +14,11 @@ import { JoinRequestModule } from './join-request/join-request.module';
 import { PaymentModule } from './payment/payment.module';
 import { ReviewModule } from './review/review.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ChatbotModule } from './chatbot/chatbot.module';
 
 
 @Module({
-  imports: [PrismaModule, AuthModule, CompanyModule, UserModule, ProgramModule, EnrollmentModule, TaskModule, PerformanceModule, PublicModule, JoinRequestModule, PaymentModule,ReviewModule,DashboardModule,
+  imports: [PrismaModule, AuthModule, CompanyModule, UserModule, ProgramModule, EnrollmentModule, TaskModule, PerformanceModule, PublicModule, JoinRequestModule, PaymentModule,ReviewModule,DashboardModule,ChatbotModule,
     ConfigModule.forRoot({
       isGlobal: true
     }),
@@ -33,6 +34,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     PaymentModule,
     ReviewModule,
     DashboardModule,
+    ChatbotModule,
   ],
 })
 export class AppModule { }

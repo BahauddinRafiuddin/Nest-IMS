@@ -11,15 +11,15 @@ const Navbar = () => {
     if (!user) return "/login";
 
     switch (user.role) {
-      case "super_admin":
+      case "SUPER_ADMIN":
         return "/superadmin";
-      case "admin":
+      case "ADMIN":
         return "/admin";
-      case "mentor":
+      case "MENTOR":
         return "/mentor";
-      case "intern":
+      case "INTERN":
         return "/intern";
-      case "public_user":
+      case "PUBLIC_USER":
         return "/public_user"
       default:
         return "/";

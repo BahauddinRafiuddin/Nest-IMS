@@ -57,12 +57,6 @@ const renderMarkdown = (text) => {
 };
 
 const AIChat = ({ type = "public" }) => {
-  const [registerStep, setRegisterStep] = useState(null);
-  const [registerData, setRegisterData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -72,6 +66,17 @@ const AIChat = ({ type = "public" }) => {
       content: "Hi! I'm your Internship Assistant. How can I help you today?",
     },
   ]);
+
+  // session management
+  const [sessionId] = useState(() => {
+    return localStorage.getItem("chat_session_id") || generateSessionId();
+  });
+
+  function generateSessionId() {
+    const id = "guest_" + Math.random().toString(36).substring(2, 10);
+    localStorage.setItem("chat_session_id", id);
+    return id;
+  }
 
   const scrollRef = useRef(null);
 
@@ -103,19 +108,13 @@ const AIChat = ({ type = "public" }) => {
     // Add user message
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
 
-    // ✅ STEP 1: HANDLE REGISTER FLOW FIRST (VERY IMPORTANT)
-    if (registerStep) {
-      handleRegisterFlow(userMessage);
-      return;
-    }
-
     setLoading(true);
 
     try {
       const data =
         type === "private"
           ? await privateChatHandler({ message: userMessage })
-          : await publicChatHandler({ message: userMessage });
+          : await publicChatHandler({ message: userMessage,sessionId });
 
       // ✅ STEP 2: START REGISTER FLOW
       if (data.action === "REGISTER") {
@@ -146,119 +145,6 @@ const AIChat = ({ type = "public" }) => {
       ]);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleRegisterFlow = async (userMessage) => {
-    const cleanInput = userMessage.trim();
-
-    //  CANCEL OPTION
-    if (cleanInput.toLowerCase() === "cancel") {
-      setRegisterStep(null);
-      setRegisterData({ name: "", email: "", password: "" });
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "ai",
-          content: "❌ Registration cancelled. You can start again anytime.",
-        },
-      ]);
-      return;
-    }
-
-    // STEP 1: NAME
-    if (registerStep === "name") {
-      const nameRegex = /^[A-Za-z ]{3,30}$/;
-
-      if (!nameRegex.test(cleanInput)) {
-        return setMessages((prev) => [
-          ...prev,
-          {
-            role: "ai",
-            content: "❌ Enter a valid name (3–30 letters only).",
-          },
-        ]);
-      }
-
-      setRegisterData((prev) => ({ ...prev, name: cleanInput }));
-      setRegisterStep("email");
-
-      return setMessages((prev) => [
-        ...prev,
-        {
-          role: "ai",
-          content: "📧 Enter your email address:\n\n(Type 'cancel' to exit)",
-        },
-      ]);
-    }
-
-    // STEP 2: EMAIL
-    if (registerStep === "email") {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (!emailRegex.test(cleanInput)) {
-        return setMessages((prev) => [
-          ...prev,
-          { role: "ai", content: "❌ Invalid email format. Try again." },
-        ]);
-      }
-
-      setRegisterData((prev) => ({ ...prev, email: cleanInput }));
-      setRegisterStep("password");
-
-      return setMessages((prev) => [
-        ...prev,
-        {
-          role: "ai",
-          content:
-            "🔒 Create password (8+ chars, 1 capital, 1 number):\n\n(Type 'cancel' to exit)",
-        },
-      ]);
-    }
-
-    // STEP 3: PASSWORD
-    if (registerStep === "password") {
-      const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-
-      if (!passwordRegex.test(cleanInput)) {
-        return setMessages((prev) => [
-          ...prev,
-          {
-            role: "ai",
-            content: "❌ Weak password. Include 1 capital letter & 1 number.",
-          },
-        ]);
-      }
-
-      const finalData = {
-        ...registerData,
-        password: cleanInput,
-      };
-
-      try {
-        await registerUser(finalData);
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "ai",
-            content: "🎉 Registration successful! You can now login.",
-          },
-        ]);
-
-        // ✅ RESET
-        setRegisterStep(null);
-        setRegisterData({ name: "", email: "", password: "" });
-      } catch (err) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "ai",
-            content: err.response?.data?.message || "Registration failed",
-          },
-        ]);
-      }
     }
   };
 
@@ -343,24 +229,6 @@ const AIChat = ({ type = "public" }) => {
               <Send size={18} />
             </button>
           </form>
-          {registerStep && (
-            <div className="px-4 pb-3">
-              <button
-                onClick={() => {
-                  setRegisterStep(null);
-                  setRegisterData({ name: "", email: "", password: "" });
-
-                  setMessages((prev) => [
-                    ...prev,
-                    { role: "ai", content: "❌ Registration cancelled." },
-                  ]);
-                }}
-                className="w-full text-sm text-red-600 border border-red-300 py-2 rounded-lg hover:bg-red-50 transition cursor-pointer"
-              >
-                Cancel Registration
-              </button>
-            </div>
-          )}
         </div>
       )}
 
