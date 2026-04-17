@@ -55,11 +55,21 @@ export class IntentClassifierStrategy {
       "commission",
     ],
     PUBLIC_USER: [
+      "profile_details",
       "companies",
       "programs",
       "join_requests",
       "general",
     ],
+    GUEST: [
+      "companies",
+      "programs",
+      "general",
+      "register",
+      "login",
+      "joining"
+    ],
+
   };
 
   async classify(message: string, role: string): Promise<string> {
@@ -70,7 +80,7 @@ export class IntentClassifierStrategy {
       return 'restricted';
     }
 
-    
+
     //  2. RULE BASED
     let intent = this.ruleBasedIntent(lower);
 
@@ -91,6 +101,8 @@ export class IntentClassifierStrategy {
   }
 
   private ruleBasedIntent(lower: string): string | null {
+    if (lower.includes('register') || lower.includes('sign up')) return 'register';
+    if (lower.includes('login') || lower.includes('sign in')) return 'login';
     if (lower.includes('profile')) return 'profile_details';
     if (lower.includes('task')) return 'tasks';
     if (lower.includes('program')) return 'programs';
@@ -123,6 +135,7 @@ export class IntentClassifierStrategy {
       - No sentence
       - No punctuation
       - If unsure return "general"
+      - if ask about joinig return register
 
       User Role: ${normalizedRole}
       Message: "${message}"

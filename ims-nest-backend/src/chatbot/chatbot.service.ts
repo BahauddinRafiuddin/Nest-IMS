@@ -69,11 +69,80 @@ export class ChatbotService {
     return { reply, intent };
   }
 
-  async handlePublicChat(userId: string, message: string) {
-    const session = getSession(userId);
+  async handlePublicChat(user: any, userMessage: string) {
+    const session = getSession(user.id);
+    const message = userMessage.trim();
 
-    // STEP 1: NAME
+    // REGISTER FLOW (ONLY GUEST)
+    if (user.role === 'GUEST' && session.step) {
+      return this.handleRegisterSteps(user.id, session, message);
+    }
+
+    // Intent
+    const intent = await this.intentStrategy.classify(message, user.role);
+
+    // RESTRICTED
+    if (intent === 'restricted') {
+      return {
+        reply: "I am specialized only in internship platform queries.",
+      };
+    }
+
+    // SPECIAL ACTIONS
+
+    if (intent === 'register' && user.role === 'GUEST') {
+      setSession(user.id, { step: 'ask_name' });
+
+      return {
+        reply: "Let's get you registered! What's your name?",
+      };
+    }
+    if (intent === 'login') {
+      return {
+        reply: "You can login from the top right login button in the navbar.",
+      };
+    }
+
+    const context = await this.contextStrategy.build(intent, user)
+
+    const systemPrompt = `
+    You are an AI assistant for Internship Management System.
+
+    User Role: ${user.role}
+
+    STRICT RULES:
+    - You are NOT the user
+    - Use "your" only for logged-in users
+    - For GUEST → use "our platform"
+    - Do NOT show restricted data
+    - Do NOT generate code
+    - Max 2-3 sentences
+
+    Intent: ${intent}
+
+    Context:
+    ${context ? JSON.stringify(context) : 'No data available'}
+    `;
+
+    const reply = await this.groqProvider.generateResponse([
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: message },
+    ]);
+
+    return { reply, intent };
+
+  }
+
+  private async handleRegisterSteps(userId: string, session: any, message: string) {
+
+    // NAME
     if (session.step === 'ask_name') {
+      const nameRegex = /^[A-Za-z ]{3,30}$/;
+
+      if (!nameRegex.test(message)) {
+        return { reply: "❌ Enter valid name (3–30 letters)." };
+      }
+
       setSession(userId, {
         ...session,
         name: message,
@@ -83,11 +152,20 @@ export class ChatbotService {
       return { reply: "Great! Now enter your email." };
     }
 
-    // STEP 2: EMAIL
+    // EMAIL
     if (session.step === 'ask_email') {
-      const emailRegex = /^[a-zA-Z][a-zA-Z0-9._%+-]{2,}@[a-z0-9.-]+\.[a-z]{2,}$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
       if (!emailRegex.test(message)) {
-        return { reply: "Please enter a valid email." };
+        return { reply: "❌ Invalid email." };
+      }
+
+      const existing = await this.prisma.user.findUnique({
+        where: { email: message },
+      });
+
+      if (existing) {
+        return { reply: "❌ Email already registered." };
       }
 
       setSession(userId, {
@@ -96,43 +174,28 @@ export class ChatbotService {
         step: 'ask_password',
       });
 
-      return { reply: "Perfect! Now set a password." };
+      return { reply: "Now set a password." };
     }
 
-    // STEP 3: PASSWORD
+    // PASSWORD
     if (session.step === 'ask_password') {
       const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
+
       if (!passwordRegex.test(message)) {
-        return { reply: "Password Must Be Must have 1 Cap, 1 Num, 1 Special (Min 8)" }
-      }
-      const data = {
-        ...session,
-        message
-      }
-      try {
-        await this.authService.register(data)
-        clearSession(userId);
-        return {
-          reply: "🎉 Registration successful! You can now login.",
-        };
-
-      } catch (error) {
-        return {
-          reply: error,
-        };
+        return { reply: "❌ Weak password." };
       }
 
-    }
+      await this.authService.register({
+        name: session.name,
+        email: session.email,
+        password: message,
+      });
 
-    // START FLOW
-    if (message.toLowerCase().includes('register')) {
-      setSession(userId, { step: 'ask_name' });
+      clearSession(userId);
 
       return {
-        reply: "Let's get you registered! What's your name?",
+        reply: "🎉 Registration successful! You can now login.",
       };
     }
-
-    return { reply: "How can I help you?" };
   }
 }

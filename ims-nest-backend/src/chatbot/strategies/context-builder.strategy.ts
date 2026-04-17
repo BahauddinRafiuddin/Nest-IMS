@@ -118,6 +118,10 @@ export class ContextBuilderStrategy {
           },
         });
 
+      // Auth
+      case "joining":
+        return "Type Register To Start Registration or you can login from top right login button"
+
       // DEFAULT
       default:
         return null;
@@ -188,7 +192,8 @@ export class ContextBuilderStrategy {
       });
     }
 
-    if(normalizedRole === "PUBLIC_USER"){
+    // Available Programs
+    if(normalizedRole === "PUBLIC_USER" || normalizedRole === "GUEST"){
       const programs=await this.prisma.internshipProgram.findMany({
         include:{
           company:true

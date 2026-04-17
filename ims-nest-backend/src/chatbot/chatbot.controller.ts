@@ -15,9 +15,13 @@ export class ChatbotController {
   }
 
   @Post('public')
-  async publicChat(@Body() body: any){
+  async publicChat(@Body() body: any) {
     const { message, sessionId } = body;
-      const userId = sessionId
-    return this.chatbotService.handlePublicChat(userId,message)
+    let user: any = {
+      id: sessionId,
+      role: 'GUEST',
+      companyId: null,
+    };
+    return this.chatbotService.handlePublicChat(user, message)
   }
 }
