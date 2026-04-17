@@ -105,7 +105,7 @@ const Mentors = () => {
 
   const handleDelete = async () => {
     try {
-      const res = await deleteMentorById(deleteMentor._id);
+      const res = await deleteMentorById(deleteMentor.id);
       toastSuccess(res.message);
       setDeleteMentor(null);
       fetchMentors();
@@ -307,7 +307,7 @@ const Mentors = () => {
                 <tbody className="divide-y divide-slate-50">
                   {mentors.map((mentor) => (
                     <tr
-                      key={mentor._id}
+                      key={mentor.id}
                       className="hover:bg-slate-50 transition-colors group"
                     >
                       <td className="px-6 py-4">

@@ -15,6 +15,7 @@ export class ChatbotService {
     private readonly prisma: PrismaService,
     private authService: AuthService
   ) { }
+  private cancelKeywords = ['cancel', 'exit', 'stop', 'quit'];
 
   async handlePrivateChat(user: any, message: string) {
     const { role } = user;
@@ -71,10 +72,30 @@ export class ChatbotService {
 
   async handlePublicChat(user: any, userMessage: string) {
     const session = getSession(user.id);
-    const message = userMessage.trim();
+    const message = userMessage.trim().toLowerCase();
+
+    if (this.cancelKeywords.includes(message)) {
+      if (user.role === 'GUEST' && session.step) {
+        clearSession(user.id);
+
+        return {
+          reply: "❌ Registration cancelled. Let me know how else I can help you.",
+        };
+      }
+      return {
+        reply: "No active process to cancel.",
+      };
+    }
 
     // REGISTER FLOW (ONLY GUEST)
     if (user.role === 'GUEST' && session.step) {
+      if (this.cancelKeywords.includes(message)) {
+        clearSession(user.id);
+
+        return {
+          reply: "❌ Registration cancelled. Let me know how else I can help you.",
+        };
+      }
       return this.handleRegisterSteps(user.id, session, message);
     }
 
@@ -94,7 +115,7 @@ export class ChatbotService {
       setSession(user.id, { step: 'ask_name' });
 
       return {
-        reply: "Let's get you registered! What's your name?",
+        reply: "Let's get you registered! What's your name? (type 'cancel' to stop)",
       };
     }
     if (intent === 'login') {
@@ -149,7 +170,7 @@ export class ChatbotService {
         step: 'ask_email',
       });
 
-      return { reply: "Great! Now enter your email." };
+      return { reply: "Great! Now enter your email.(type 'cancel' to stop)" };
     }
 
     // EMAIL
@@ -174,7 +195,7 @@ export class ChatbotService {
         step: 'ask_password',
       });
 
-      return { reply: "Now set a password." };
+      return { reply: "Now set a password.(type 'cancel' to stop)" };
     }
 
     // PASSWORD

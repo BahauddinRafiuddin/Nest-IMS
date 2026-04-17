@@ -111,7 +111,7 @@ const CompanyReviews = () => {
             </select>
           </div>
 
-          <div className="flex gap-2">
+          {/* <div className="flex gap-2">
             <button
               onClick={() => handleExport("excel")}
               disabled={loading}
@@ -126,7 +126,7 @@ const CompanyReviews = () => {
             >
               Export PDF
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 

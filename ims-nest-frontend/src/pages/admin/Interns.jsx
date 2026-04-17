@@ -325,7 +325,7 @@ const Interns = () => {
                 <tbody className="divide-y divide-slate-50">
                   {interns.map((intern) => (
                     <tr
-                      key={intern._id}
+                      key={intern.id}
                       className="hover:bg-slate-50 transition-colors group"
                     >
                       <td className="px-6 py-4">

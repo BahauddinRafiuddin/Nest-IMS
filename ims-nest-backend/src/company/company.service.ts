@@ -40,7 +40,7 @@ export class CompanyService {
           companyId: company.id,
           commissionPercentage: company.commissionPercentage,
           startDate: new Date(),
-          updatedById: userId, 
+          updatedById: userId,
         },
       });
 
@@ -296,4 +296,38 @@ export class CompanyService {
       };
     });
   }
+
+  async getCommissionHistoryForExport(companyId: string) {
+    const history = await this.prisma.commissionHistory.findMany({
+      where: { companyId },
+      include: {
+        company: {
+          select: { name: true },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return history.map((item) => {
+      const start = new Date(item.startDate);
+      const end = item.endDate ? new Date(item.endDate) : new Date();
+
+      const durationDays = Math.ceil(
+        (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
+      );
+
+      return {
+        company: item.company.name,
+        commission: `${item.commissionPercentage}%`,
+        startDate: start.toISOString().split('T')[0],
+        endDate: item.endDate
+          ? end.toISOString().split('T')[0]
+          : 'Active',
+        duration: `${durationDays} days`,
+      };
+    });
+  }
 }
+

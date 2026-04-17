@@ -7,7 +7,7 @@ export const getAllPrograms = async (page, limit, search) => {
 
 export const exportProgramsApi = async (search, format) => {
   const res = await api.get(
-    `/admin/programs/export?search=${search}&format=${format}`,
+    `/program/export?search=${search}&format=${format}`,
     { responseType: "blob" } // Critical for downloading files
   );
 

@@ -298,5 +298,52 @@ export class ProgramService {
     );
   }
 
- 
+  async getProgramsForExport(companyId: string, search?: string) {
+    const where: any = {
+      companyId,
+      ...(search && {
+        OR: [
+          { title: { contains: search } },
+          { domain: { contains: search } },
+        ],
+      }),
+    };
+
+    const programs = await this.prisma.internshipProgram.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        mentor: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        _count: {
+          select: {
+            tasks: true,
+          },
+        },
+      },
+    });
+
+    return programs.map((p) => ({
+      id: p.id,
+      title: p.title,
+      domain: p.domain,
+      status: p.status,
+      createdAt: p.createdAt,
+      mentor: p.mentor,
+      totalTasks: p._count.tasks,
+      durationInWeeks: p.durationInWeeks,
+      description: p.description,
+      startDate: p.startDate,
+      endDate: p.endDate,
+      price: p.price,
+      type: p.type,
+    }));
+  }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards, Res } from '@nestjs/common';
 import { ReviewService } from './review.service';
 import { JwtAuthGuard } from '../common/guards/jwt.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -6,12 +6,15 @@ import { Role } from '@prisma/client';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { RolesGuard } from '../common/guards/roles.guard';
+import type { Response } from 'express';
+import { ExportService } from '../export/export.service';
+
 
 @Controller('review')
-@UseGuards(JwtAuthGuard,RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 
 export class ReviewController {
-  constructor(private reviewService: ReviewService) { }
+  constructor(private reviewService: ReviewService, private exportService: ExportService) { }
   @Post()
   @Roles(Role.INTERN)
   createReview(
@@ -33,13 +36,13 @@ export class ReviewController {
     @GetUser() user: any,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
-    @Query('minRating') minRating ?: string
+    @Query('minRating') minRating?: string
   ) {
     return this.reviewService.getCompanyReviews(
       user.companyId,
       Number(page) || 1,
       Number(limit) || 5,
-      minRating  ? Number(minRating ) : undefined
+      minRating ? Number(minRating) : undefined
     );
   }
 
@@ -66,4 +69,5 @@ export class ReviewController {
   rejectReview(@Param('id') id: string) {
     return this.reviewService.updateReviewStatus(id, 'REJECTED');
   }
+
 }

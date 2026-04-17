@@ -3,7 +3,7 @@ import api from "./axios"
 // Get pending requests (admin)
 export const getJoinRequests = async (page = 1, limit = 10) => {
   const res = await api.get(`/join-request?page=${page}&limit=${limit}`);
-  return res.data; 
+  return res.data;
 };
 
 // Review request
@@ -24,7 +24,7 @@ export const getAllInterns = async (page, limit, search) => {
 
 export const exportInternsApi = async (search, format) => {
   const res = await api.get(
-    `/admin/intern/export?search=${search}&format=${format}`,
+    `/user/interns/export?search=${search}&format=${format}`,
     { responseType: "blob" } // Critical for downloading files
   );
 
@@ -44,8 +44,8 @@ export const getAllMentors = async (page, limit, search) => {
 }
 
 // get mentors to assign the programs
-export const getAvailableMentors=async () => {
-  const res=await api.get('/user/availableMentors')
+export const getAvailableMentors = async () => {
+  const res = await api.get('/user/availableMentors')
   return res.data
 }
 
@@ -73,7 +73,7 @@ export const exportReviewsApi = async (rating, format = 'excel') => {
 
 export const exportMentorApi = async (search, format) => {
   const res = await api.get(
-    `/admin/mentors/export?search=${search}&format=${format}`,
+    `/user/mentors/export?search=${search}&format=${format}`,
     { responseType: "blob" } // Critical for downloading files
   );
 
@@ -125,7 +125,7 @@ export const exportFinanceApi = async (filters, format = 'excel') => {
     format
   }).toString();
 
-  const res = await api.get(`/admin/finance/export?${queryString}`, {
+  const res = await api.get(`/dashboard/admin/export/transaction-report?${queryString}`, {
     responseType: "blob", // Critical for downloading binary data
   });
 

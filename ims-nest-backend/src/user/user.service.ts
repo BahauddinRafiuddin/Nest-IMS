@@ -322,36 +322,155 @@ export class UserService {
   }
 
   async updateInternStatus(
-  internId: string,
-  isActive: boolean,
-  companyId: string
-) {
+    internId: string,
+    isActive: boolean,
+    companyId: string
+  ) {
 
-  // find intern
-  const intern = await this.prisma.user.findUnique({
-    where: { id: internId },
-  });
+    // find intern
+    const intern = await this.prisma.user.findUnique({
+      where: { id: internId },
+    });
 
-  if (!intern || intern.role !== 'INTERN') {
-    throw new NotFoundException('Intern Not Found');
+    if (!intern || intern.role !== 'INTERN') {
+      throw new NotFoundException('Intern Not Found');
+    }
+
+    // check company ownership
+    if (intern.companyId !== companyId) {
+      throw new ForbiddenException('Unauthorized');
+    }
+
+    // update status
+    await this.prisma.user.update({
+      where: { id: internId },
+      data: {
+        isActive,
+      },
+    });
+
+    return {
+      success: true,
+      message: `${intern.name} ${isActive ? 'Activated' : 'Deactivated'}`,
+    };
   }
 
-  // check company ownership
-  if (intern.companyId !== companyId) {
-    throw new ForbiddenException('Unauthorized');
+  async getInternsForExport(companyId: string, search?: string) {
+    const where: any = {
+      companyId,
+      role: "INTERN",
+      ...(search && {
+        OR: [
+          { name: { contains: search } },
+          { email: { contains: search } },
+        ],
+      }),
+    };
+
+    const interns = await this.prisma.user.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        isActive: true,
+      },
+    });
+
+    const internIds = interns.map((i) => i.id);
+
+    const enrollments = await this.prisma.enrollment.findMany({
+      where: {
+        internId: { in: internIds },
+      },
+      include: {
+        mentor: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    const map = new Map();
+
+    enrollments.forEach((e) => {
+      map.set(e.internId, {
+        mentor: e.mentor,
+        status: e.status,
+      });
+    });
+
+    return interns.map((i) => ({
+      ...i,
+      mentor: map.get(i.id)?.mentor || null,
+      enrollmentStatus: map.get(i.id)?.status || null,
+    }));
   }
 
-  // update status
-  await this.prisma.user.update({
-    where: { id: internId },
-    data: {
-      isActive,
-    },
-  });
+  async getMentorsForExport(companyId: string, search?: string) {
+    const where: any = {
+      companyId,
+      role: "MENTOR",
+      ...(search && {
+        OR: [
+          { name: { contains: search } },
+          { email: { contains: search } },
+        ],
+      }),
+    };
 
-  return {
-    success: true,
-    message: `${intern.name} ${isActive ? 'Activated' : 'Deactivated'}`,
-  };
-}
+    const mentors = await this.prisma.user.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        isActive: true,
+      },
+    });
+
+    const mentorIds = mentors.map((m) => m.id);
+
+    const enrollments = await this.prisma.enrollment.findMany({
+      where: {
+        mentorId: { in: mentorIds },
+      },
+      select: {
+        mentorId: true,
+        status: true,
+      },
+    });
+
+    const statsMap = new Map();
+
+    enrollments.forEach((e) => {
+      if (!statsMap.has(e.mentorId)) {
+        statsMap.set(e.mentorId, {
+          total: 0,
+          active: 0,
+          completed: 0,
+        });
+      }
+
+      const stats = statsMap.get(e.mentorId);
+
+      stats.total++;
+
+      if (["IN_PROGRESS", "APPROVED"].includes(e.status)) {
+        stats.active++;
+      }
+
+      if (e.status === "COMPLETED") {
+        stats.completed++;
+      }
+    });
+
+    return mentors.map((m) => ({
+      ...m,
+      internCount: statsMap.get(m.id)?.total || 0,
+      activeInternships: statsMap.get(m.id)?.active || 0,
+      completedInternships: statsMap.get(m.id)?.completed || 0,
+    }));
+  }
 }

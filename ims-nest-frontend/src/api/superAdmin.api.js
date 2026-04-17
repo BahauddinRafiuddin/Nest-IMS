@@ -63,7 +63,7 @@ export const getAllCompaniesCommissionHistory = async () => {
 export const exportCompanyCommissionHistory = async (companyId, format) => {
   try {
     const res = await api.get(
-      `/superadmin/comission-history/export/${companyId}?format=${format}`,
+      `/company/${companyId}/commission-history/export?format=${format}`,
       {
         responseType: "blob", // ✅ VERY IMPORTANT
       }
@@ -84,6 +84,37 @@ export const exportCompanyCommissionHistory = async (companyId, format) => {
     link.remove();
   } catch (error) {
     console.error("Download failed", error);
+  }
+};
+
+export const exportTransactionReport = async (filters = {}, format = "excel") => {
+  try {
+    const res = await api.get(
+      `/dashboard/export/transaction-report`,
+      {
+        params: {
+          ...filters, // ✅ companyId, date, commission
+          format,
+        },
+        responseType: "blob",
+      }
+    );
+
+    const fileType = format === "excel" ? "xlsx" : "pdf";
+
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.setAttribute("download", `transaction-report.${fileType}`);
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Transaction export failed", error);
   }
 };
 

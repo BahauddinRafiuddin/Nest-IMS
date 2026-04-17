@@ -98,7 +98,7 @@ export class DashboardService {
     startDate?: string;
     endDate?: string;
     companyId?: string;
-  }) {
+  }, isExport = false) {
     const { commission, startDate, endDate, companyId } = query;
 
     // 🔥 Build filter
@@ -201,6 +201,9 @@ export class DashboardService {
       totalTransactions: item._count,
     }));
 
+    if (isExport) {
+      return payments
+    }
     return {
       success: true,
       summary,
@@ -542,4 +545,43 @@ export class DashboardService {
       interns: result,
     };
   }
+
+  async getTransactionReportForExport(query: {
+  commission?: string;
+  startDate?: string;
+  endDate?: string;
+  companyId?: string;
+}) {
+  const { commission, startDate, endDate, companyId } = query;
+
+  const where: any = {
+    paymentStatus: 'SUCCESS',
+  };
+
+  // 🔐 Admin restriction
+  if (companyId) {
+    where.companyId = companyId;
+  }
+
+  if (commission) {
+    where.commissionPercentage = Number(commission);
+  }
+
+  if (startDate && endDate) {
+    where.createdAt = {
+      gte: new Date(startDate),
+      lte: new Date(endDate),
+    };
+  }
+
+  return this.prisma.payment.findMany({
+    where,
+    include: {
+      intern: { select: { name: true, email: true } },
+      program: { select: { title: true, price: true } },
+      company: { select: { name: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+}
 }

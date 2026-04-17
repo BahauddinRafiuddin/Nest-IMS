@@ -15,6 +15,7 @@ import { PaymentModule } from './payment/payment.module';
 import { ReviewModule } from './review/review.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ChatbotModule } from './chatbot/chatbot.module';
+import { ExportModule } from './export/export.module';
 
 
 @Module({

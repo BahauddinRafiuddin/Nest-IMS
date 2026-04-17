@@ -115,45 +115,45 @@ export class ReviewService {
 
   // Company Review
   async getCompanyReviews(
-  companyId: string,
-  page = 1,
-  limit = 5,
-  rating?: number
-) {
-  const skip = (page - 1) * limit;
+    companyId: string,
+    page = 1,
+    limit = 5,
+    rating?: number
+  ) {
+    const skip = (page - 1) * limit;
 
-  const where: any = {
-    companyId,
-    status: 'ACCEPTED', 
-  };
+    const where: any = {
+      companyId,
+      status: 'ACCEPTED',
+    };
 
-  if (rating !== undefined) {
-    where.rating = {
-      gte: rating,
+    if (rating !== undefined) {
+      where.rating = {
+        gte: rating,
+      };
+    }
+
+    const [reviews, total] = await this.prisma.$transaction([
+      this.prisma.review.findMany({
+        where,
+        include: {
+          intern: { select: { name: true } },
+          program: { select: { title: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.review.count({ where }),
+    ]);
+
+    return {
+      success: true,
+      reviews,
+      total,
+      totalPages: Math.ceil(total / limit),
     };
   }
-
-  const [reviews, total] = await this.prisma.$transaction([
-    this.prisma.review.findMany({
-      where,
-      include: {
-        intern: { select: { name: true } },
-        program: { select: { title: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: limit,
-    }),
-    this.prisma.review.count({ where }),
-  ]);
-
-  return {
-    success: true,
-    reviews,
-    total,
-    totalPages: Math.ceil(total / limit),
-  };
-}
 
   // Super Admin Can see Pening reviews
   async getPendingReviews(page = 1, limit = 10) {
@@ -209,4 +209,6 @@ export class ReviewService {
       message: `Review ${status.toLowerCase()} successfully`,
     };
   }
+
+
 }
