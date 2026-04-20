@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { getJoinRequests, reviewJoinRequest } from "../../api/admin.api"; // Import the review function
 import Pagination from "../../components/common/Pagination";
-import { toast } from "react-hot-toast"; // Optional: for notifications
+import { toast } from "react-hot-toast"; 
 
 const JoinRequestsPage = () => {
   const [data, setData] = useState({ requests: [], pagination: {} });

@@ -20,7 +20,6 @@ import useAuth from "../../hooks/useAuth";
 const Sidebar = ({ onClose }) => {
   const { user, logout } = useAuth();
 
-  // 1. IMPROVED THEME CONFIGURATION: Solid backgrounds for high visibility
   const themes = {
     SUPER_ADMIN: {
       sidebarBg: "bg-[#0f172a]", // Deep Navy
