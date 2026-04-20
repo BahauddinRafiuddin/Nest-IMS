@@ -120,7 +120,7 @@ export class CompanyController {
     @Query() query: ExportQueryDto,
     @Res() res: Response,
   ) {
-    const history = await this.companyService.getCommissionHistoryForExport(companyId);
+    const history = await this.companyService.getCommissionHistoryForExport(companyId)
 
     const columns = [
       { header: 'Company', key: 'company', width: 25 },
