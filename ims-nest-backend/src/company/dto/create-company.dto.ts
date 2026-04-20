@@ -7,27 +7,24 @@ import {
   Max,
   IsString,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCompanyDto {
-  @IsNotEmpty()
+  @ApiProperty({ example: 'Google Inc.' })
   name!: string;
 
-  @IsEmail()
+  @ApiProperty({ example: 'company@gmail.com' })
   email!: string;
 
-  @IsOptional()
-  @IsString()
+  @ApiProperty({ example: '+919876543210', required: false })
   phone?: string;
 
-  @IsOptional()
-  @IsString()
+  @ApiProperty({ example: 'Surat, Gujarat', required: false })
   address?: string;
 
-  @IsNumber()
-  @Min(1)
-  @Max(95)
+  @ApiProperty({ example: 20 })
   commissionPercentage!: number;
 
-  @IsNotEmpty()
+  @ApiProperty({ example: 'Admin Name' })
   adminName!: string;
 }

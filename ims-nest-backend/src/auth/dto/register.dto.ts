@@ -14,7 +14,7 @@ export class RegisterDto {
   @MinLength(8)
   password!: string
 
-  @ApiProperty({ example: 'INTERN', required: false })
+  @ApiProperty({ example: 'PUBLIC_USER', required: false })
   @IsOptional()
   role?: string
 
